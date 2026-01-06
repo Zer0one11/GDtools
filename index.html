@@ -12,30 +12,28 @@
         .container { background: var(--panel); width: 95%; max-width: 1000px; margin: 20px 0; padding: 25px; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         h1 { color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 15px 0; font-size: 1.8rem; text-align: center; }
         
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         button { background: #000; color: #fff; border: 1px solid var(--border); padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; text-transform: uppercase; }
-        button:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
+        button:hover { border-color: var(--accent); color: var(--accent); }
         
-        .file-zone { border: 2px dashed var(--border); padding: 30px; text-align: center; color: var(--text-dim); cursor: pointer; margin-bottom: 20px; border-radius: 8px; }
-        .file-zone:hover { border-color: var(--accent); color: var(--text); background: rgba(168, 85, 247, 0.05); }
+        .file-zone { border: 2px dashed var(--border); padding: 40px; text-align: center; color: var(--text-dim); cursor: pointer; border-radius: 8px; margin-top: 15px; }
+        .file-zone:hover { border-color: var(--accent); color: var(--text); }
 
-        .editor-header { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        input, select { background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 4px; width: 100%; box-sizing: border-box; outline: none; }
+        .editor-header { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+        input { background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 4px; width: 100%; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--accent); }
 
-        .table-wrap { max-height: 400px; overflow-y: auto; border: 1px solid var(--border); background: #000; margin: 15px 0; border-radius: 4px; }
+        .table-wrap { max-height: 450px; overflow-y: auto; border: 1px solid var(--border); background: #000; margin-top: 15px; border-radius: 4px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; font-family: 'Consolas', monospace; }
         th { position: sticky; top: 0; background: #0a0a0a; color: var(--accent); padding: 12px; border-bottom: 1px solid var(--accent); text-align: left; }
         td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
         
-        .hidden { display: none; }
-        .search-box { border-color: var(--border); margin-bottom: 15px; border-bottom: 1px solid var(--accent); }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 999; }
-        .modal-content { background: var(--panel); padding: 30px; border-radius: 12px; border: 1px solid var(--accent); max-width: 500px; width: 90%; text-align: center; }
-
-        .footer { margin-top: auto; padding: 30px; text-align: center; font-size: 0.85rem; color: var(--text-dim); border-top: 1px solid var(--border); width: 100%; }
+        .hidden { display: none !important; }
+        .footer { margin-top: auto; padding: 20px; text-align: center; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid var(--border); width: 100%; }
         .footer strong { color: var(--accent); }
+
+        .help-section { margin-top: 30px; padding: 15px; border: 1px solid #333; border-radius: 6px; background: #0a0a0a; font-size: 0.8rem; color: #888; text-align: center; }
     </style>
 </head>
 <body>
@@ -51,34 +49,34 @@
 <div id="editor-page" class="container hidden">
     <h1>GMD Checker</h1>
     
-    <div class="file-zone" id="dropZone" onclick="document.getElementById('fileIn').click()">
-        Кликните для загрузки .gmd файла
+    <div id="dropZone" class="file-zone" onclick="document.getElementById('fileIn').click()">
+        Загрузите .gmd файл для редактирования
         <input type="file" id="fileIn" class="hidden" accept=".gmd" onchange="loadGMD(this)">
     </div>
 
-    <div id="edit-controls" class="hidden">
+    <div id="editor-ui" class="hidden">
         <div class="editor-header">
             <div><label style="font-size: 0.7rem; color: var(--accent);">НАЗВАНИЕ</label><input type="text" id="lvlName"></div>
             <div><label style="font-size: 0.7rem; color: var(--accent);">ОПИСАНИЕ</label><input type="text" id="lvlDesc"></div>
         </div>
 
-        <input type="text" id="objSearch" class="search-box" placeholder="Поиск объектов (ID, X, Y...)" oninput="renderObjects()">
+        <input type="text" id="objSearch" placeholder="Поиск объектов (ID, X, Y...)" oninput="renderObjects()" style="border-bottom: 1px solid var(--accent); margin-bottom: 10px;">
         
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <button onclick="addObject()" style="background: #111; border-color: #22c55e; flex: 1;">+ Добавить блок</button>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="addObject()" style="background: #0a1a0a; border-color: #22c55e; flex: 1;">+ Добавить</button>
             <button onclick="saveGMD()" style="background: var(--accent); color: #000; flex: 2;">СОХРАНИТЬ .GMD</button>
         </div>
 
         <div class="table-wrap">
             <table>
-                <thead>
-                    <tr><th>ID</th><th>X</th><th>Y</th><th>Scale</th><th>Rot</th><th></th></tr>
-                </thead>
+                <thead><tr><th>ID</th><th>X</th><th>Y</th><th>Scale</th><th>Rot</th><th></th></tr></thead>
                 <tbody id="objList"></tbody>
             </table>
         </div>
 
-        <button onclick="openHelp()" style="width: 100%; border-color: #444; margin-top: 10px; font-size: 0.7rem; color: #888;">ИНСТРУКЦИЯ (ID ОБЪЕКТОВ)</button>
+        <div class="help-section">
+            <strong>ИНСТРУКЦИЯ:</strong> Чтобы узнать ID объекта, используйте мод <strong>Better Object Info</strong> в Geode. Выделите объект в редакторе, чтобы увидеть его ID.
+        </div>
     </div>
     
     <button style="width:100%; margin-top:15px; background:#18181b" onclick="location.reload()">Назад в меню</button>
@@ -86,20 +84,12 @@
 
 <div id="gap-page" class="container hidden">
     <h1>Gap Calculator</h1>
-    <button style="width:100%; margin-top:20px; background:#18181b" onclick="showPage('main-menu')">Назад в меню</button>
+    <p style="text-align: center; color: var(--text-dim);">Калькулятор скоро будет здесь...</p>
+    <button style="width:100%; margin-top:20px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
 </div>
 
 <div class="footer">
-    GDtools | Автор: <strong>HELFZz</strong><br>
-    Special Thanks:
-</div>
-
-<div id="helpModal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <h2 style="color: var(--accent); margin-top: 0;">ИНСТРУКЦИЯ</h2>
-        <p>Чтобы узнать ID нужного объекта, скачайте мод <strong>Better Object Info</strong> в Geode, зайдите в редактор и выделите нужный блок для просмотра ID.</p>
-        <button style="width:100%; margin-top: 20px; background: var(--accent); color: #000;" onclick="closeHelp()">ПОНЯТНО</button>
-    </div>
+    GDtools | Автор: <strong>HELFZz</strong> | Special Thanks:
 </div>
 
 <script>
@@ -110,9 +100,6 @@
         document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
     }
-
-    function openHelp() { document.getElementById('helpModal').classList.remove('hidden'); }
-    function closeHelp() { document.getElementById('helpModal').classList.add('hidden'); }
 
     async function loadGMD(input) {
         const file = input.files[0];
@@ -144,10 +131,12 @@
                     for(let i=0; i<p.length; i+=2) d[p[i]] = p[i+1];
                     return d;
                 });
-                document.getElementById('edit-controls').classList.remove('hidden');
+                
+                // Показываем UI редактора только после успешной загрузки
+                document.getElementById('editor-ui').classList.remove('hidden');
                 document.getElementById('dropZone').classList.add('hidden');
                 renderObjects();
-            } catch(e) { alert("Ошибка файла!"); }
+            } catch(e) { alert("Ошибка: Не удалось прочитать объекты уровня."); }
         }
     }
 
@@ -165,7 +154,7 @@
                 <td><input type="text" value="${obj['3']}" onchange="updateObj(${idx}, '3', this.value)"></td>
                 <td><input type="text" value="${obj['128'] || '1'}" onchange="updateObj(${idx}, '128', this.value)"></td>
                 <td><input type="text" value="${obj['6'] || '0'}" onchange="updateObj(${idx}, '6', this.value)"></td>
-                <td style="text-align:right"><button onclick="removeObj(${idx})" style="color:#ef4444; border:none; background:none;">✕</button></td>
+                <td><button onclick="removeObj(${idx})" style="color:#ef4444; border:none; background:none;">✕</button></td>
             `;
             list.appendChild(row);
         });
@@ -181,15 +170,11 @@
         const b64 = btoa(String.fromCharCode.apply(null, compressed)).replace(/\+/g, '-').replace(/\//g, '_');
 
         const keys = originalXML.getElementsByTagName('k');
-        const setVal = (k, val) => {
-            for (let i = 0; i < keys.length; i++) {
-                if (keys[i].textContent === k) keys[i].nextElementSibling.textContent = val;
-            }
-        };
-
-        setVal('k2', document.getElementById('lvlName').value);
-        setVal('k3', document.getElementById('lvlDesc').value);
-        setVal('k4', b64);
+        for (let i = 0; i < keys.length; i++) {
+            if (keys[i].textContent === 'k2') keys[i].nextElementSibling.textContent = document.getElementById('lvlName').value;
+            if (keys[i].textContent === 'k3') keys[i].nextElementSibling.textContent = document.getElementById('lvlDesc').value;
+            if (keys[i].textContent === 'k4') keys[i].nextElementSibling.textContent = b64;
+        }
 
         const blob = new Blob([new XMLSerializer().serializeToString(originalXML)], {type: "text/xml"});
         const link = document.createElement('a');
