@@ -7,19 +7,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <style>
         :root {
-            --bg: #0a0a0a;
-            --panel: #161616;
+            --bg: #050505;
+            --panel: #111111;
             --accent: #8b5cf6;
-            --accent-dim: #5b21b6;
-            --text: #eeeeee;
-            --text-dim: #777777;
-            --border: #262626;
+            --text: #e5e7eb;
+            --text-dim: #666666;
+            --border: #222222;
         }
 
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             margin: 0;
             display: flex;
             flex-direction: column;
@@ -27,42 +26,36 @@
             min-height: 100vh;
         }
 
-        /* Контейнер сайта */
         .container {
             background: var(--panel);
             width: 90%;
-            max-width: 1000px;
-            margin-top: 50px;
-            padding: 40px;
+            max-width: 900px;
+            margin-top: 40px;
+            padding: 30px;
             border: 1px solid var(--border);
-            border-radius: 4px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            box-shadow: 0 10px 50px rgba(0,0,0,0.8);
         }
 
         h1 {
             color: var(--accent);
             text-transform: uppercase;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             margin: 0;
-            font-size: 2.5em;
+            font-size: 2.2em;
         }
 
         .author-box {
-            margin-bottom: 30px;
-            font-size: 0.85em;
+            margin-bottom: 25px;
+            font-size: 0.8em;
             color: var(--text-dim);
             border-bottom: 1px solid var(--border);
             padding-bottom: 10px;
+            text-transform: uppercase;
         }
 
         .author-box strong { color: var(--accent); }
 
-        /* Кнопки меню */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
         button {
             background: #000;
@@ -73,84 +66,60 @@
             text-transform: uppercase;
             cursor: pointer;
             transition: 0.2s;
-            letter-spacing: 1px;
         }
 
         button:hover {
             border-color: var(--accent);
             color: var(--accent);
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+            background: #0a0a0a;
         }
 
-        /* Стили GMD Checker */
         .file-zone {
             border: 1px dashed var(--border);
-            padding: 50px;
+            padding: 40px;
             text-align: center;
             color: var(--text-dim);
             cursor: pointer;
-            transition: 0.3s;
             margin-bottom: 20px;
         }
 
-        .file-zone:hover {
-            border-color: var(--accent);
-            background: #111;
-            color: var(--text);
-        }
+        .file-zone:hover { border-color: var(--accent); color: var(--text); }
 
         .table-wrap {
-            max-height: 500px;
+            max-height: 450px;
             overflow-y: auto;
             margin-top: 20px;
             border: 1px solid var(--border);
+            background: #000;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             font-family: 'Consolas', monospace;
-            font-size: 0.9em;
+            font-size: 0.85em;
         }
 
         th {
-            position: sticky;
-            top: 0;
-            background: #000;
+            position: sticky; top: 0;
+            background: #0a0a0a;
             color: var(--accent);
-            padding: 12px;
-            text-align: left;
-            border-bottom: 2px solid var(--accent);
-        }
-
-        td {
             padding: 10px;
-            border-bottom: 1px solid var(--border);
+            text-align: left;
+            border-bottom: 1px solid var(--accent);
         }
 
-        tr:hover { background: #1a1a1a; }
+        td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: #ccc; }
+        tr:hover { background: #161616; }
 
         .hidden { display: none; }
+        .stats { color: var(--accent); font-size: 0.9em; margin-bottom: 10px; font-weight: bold; }
 
-        /* Калькулятор */
+        /* Calc Styles */
         input, select {
-            width: 100%;
-            padding: 12px;
-            background: #000;
-            border: 1px solid var(--border);
-            color: white;
-            margin: 10px 0;
-            box-sizing: border-box;
-        }
-
-        .result-box {
-            background: #1a1520;
-            padding: 15px;
-            border: 1px solid var(--accent-dim);
-            color: var(--accent);
-            font-weight: bold;
-            margin-top: 20px;
-            display: none;
+            width: 100%; padding: 12px;
+            background: #000; border: 1px solid var(--border);
+            color: white; margin: 8px 0;
         }
     </style>
 </head>
@@ -169,46 +138,43 @@
 
 <div id="checker-page" class="container hidden">
     <h1>GMD Checker</h1>
-    <div class="author-box">Анализ каждого блока в .gmd файле</div>
+    <div class="author-box">Анализатор блоков уровня</div>
     
     <div class="file-zone" onclick="document.getElementById('fileInput').click()">
-        Кликните, чтобы выбрать файл уровня
+        Нажмите, чтобы загрузить .gmd файл
         <input type="file" id="fileInput" class="hidden" accept=".gmd" onchange="processFile(this)">
     </div>
 
-    <div id="level-info" style="color: var(--accent); font-weight: bold;"></div>
+    <div id="file-info" class="stats"></div>
 
     <div class="table-wrap">
         <table>
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>X</th>
-                    <th>Y</th>
+                    <th>X Pos</th>
+                    <th>Y Pos</th>
                     <th>Scale</th>
-                    <th>Rotation</th>
+                    <th>Rot</th>
                 </tr>
             </thead>
             <tbody id="obj-list">
-                <tr><td colspan="5" style="text-align:center;">Файл не выбран</td></tr>
+                <tr><td colspan="5" style="text-align:center; color:#444;">Список пуст</td></tr>
             </tbody>
         </table>
     </div>
     
-    <button style="width:100%; margin-top:20px; background:#111;" onclick="showPage('main-menu')">Назад</button>
+    <button style="width:100%; margin-top:20px;" onclick="showPage('main-menu')">Назад</button>
 </div>
 
 <div id="gap-page" class="container hidden">
     <h1>Gap Calculator</h1>
-    <div class="author-box">Расчет FPS по размеру гапа</div>
-    
+    <div class="author-box">Расчет FPS</div>
     <input type="number" id="gapSize" placeholder="Размер гапа (например, 3.0001)" step="0.00000001">
-    
     <select id="mode">
-        <option value="3">Normal Wave (3.0)</option>
-        <option value="6">Mini Wave (6.0)</option>
+        <option value="3">Normal Wave</option>
+        <option value="6">Mini Wave</option>
     </select>
-
     <select id="speed">
         <option value="1">1x Speed</option>
         <option value="0.5">0.5x Speed</option>
@@ -216,25 +182,29 @@
         <option value="3">3x Speed</option>
         <option value="4">4x Speed</option>
     </select>
-
-    <div style="margin: 15px 0;">
-        <input type="checkbox" id="dash" style="width: auto;"> <label for="dash">With Dash Orb (*2 FPS)</label>
-    </div>
-
+    <div style="margin: 10px 0;"><input type="checkbox" id="dash"> <label>With Dash Orb (*2)</label></div>
     <button onclick="calcGap()" style="width: 100%;">Рассчитать</button>
-    <div id="calc-res" class="result-box"></div>
-    
-    <button style="width:100%; margin-top:20px; background:#111;" onclick="showPage('main-menu')">Назад</button>
+    <div id="res" style="margin-top:20px; color:var(--accent); font-weight:bold;"></div>
+    <button style="width:100%; margin-top:20px;" onclick="showPage('main-menu')">Назад</button>
 </div>
 
 <script>
-    // Переключение страниц
     function showPage(id) {
         document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
     }
 
-    // ЛОГИКА GMD CHECKER (ЧТЕНИЕ КАЖДОГО БЛОКА)
+    // Исправленная логика поиска данных в XML
+    function getGMDValue(xml, key) {
+        const keys = xml.getElementsByTagName('k');
+        for (let i = 0; i < keys.length; i++) {
+            if (keys[i].textContent === key) {
+                return keys[i].nextElementSibling.textContent;
+            }
+        }
+        return null;
+    }
+
     async function processFile(input) {
         const file = input.files[0];
         if (!file) return;
@@ -243,67 +213,56 @@
         const parser = new DOMParser();
         const xml = parser.parseFromString(text, "text/xml");
 
-        const name = xml.querySelector('k[k="k2"] + s')?.textContent || "Unknown";
-        document.getElementById('level-info').innerText = "Уровень: " + name;
+        [span_0](start_span)// Исправленный поиск k4 и k2[span_0](end_span)
+        const levelName = getGMDValue(xml, 'k2') || "Unnamed";
+        const k4 = getGMDValue(xml, 'k4');
 
-        // Поиск упакованных данных уровня
-        let k4 = xml.querySelector('k[k="k4"] + s')?.textContent;
-        if (!k4) return alert("Ошибка: Данные k4 не найдены.");
+        if (!k4) {
+            alert("Ошибка: Данные объектов (k4) не найдены в файле.");
+            return;
+        }
+
+        document.getElementById('file-info').innerText = "Уровень: " + levelName;
 
         try {
-            // Распаковка: Base64 -> Gzip -> String
             const b64 = k4.replace(/-/g, '+').replace(/_/g, '/');
             const bin = atob(b64);
             const bytes = new Uint8Array(bin.length);
             for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
             
             const raw = pako.inflate(bytes, { to: 'string' });
-            const objects = raw.split(';'); // Каждый блок разделен ";"
+            const objects = raw.split(';');
             
             const list = document.getElementById('obj-list');
             list.innerHTML = "";
 
-            // Читаем все блоки (выводим первые 1000 для стабильности)
-            for(let i = 0; i < Math.min(objects.length, 1000); i++) {
+            for(let i = 0; i < Math.min(objects.length, 2000); i++) {
                 if(objects[i].length < 5) continue;
-                
                 const p = objects[i].split(',');
                 const data = {};
                 for (let j = 0; j < p.length; j += 2) data[p[j]] = p[j+1];
 
-                const row = `<tr>
+                list.insertAdjacentHTML('beforeend', `<tr>
                     <td>${data['1'] || '?'}</td>
-                    <td>${parseFloat(data['2'] || 0).toFixed(1)}</td>
-                    <td>${parseFloat(data['3'] || 0).toFixed(1)}</td>
+                    <td>${parseFloat(data['2'] || 0).toFixed(2)}</td>
+                    <td>${parseFloat(data['3'] || 0).toFixed(2)}</td>
                     <td>${data['128'] || '1'}</td>
                     <td>${data['6'] || '0'}°</td>
-                </tr>`;
-                list.insertAdjacentHTML('beforeend', row);
+                </tr>`);
             }
         } catch (e) {
-            alert("Ошибка декодирования. Файл защищен или поврежден.");
+            alert("Ошибка при распаковке k4. Возможно, файл поврежден.");
         }
     }
 
-    // ЛОГИКА GAP CALCULATOR
     function calcGap() {
         const gap = parseFloat(document.getElementById('gapSize').value);
-        const hit = parseFloat(document.getElementById('mode').value);
-        const spdMult = { "0.5": 0.75, "1": 0.9, "2": 1.1, "3": 1.35, "4": 1.65 };
-        const spd = spdMult[document.getElementById('speed').value];
-        const dash = document.getElementById('dash').checked;
-
-        if (!gap || gap <= 3) return alert("Введите гап больше 3");
-
-        // Упрощенная формула зависимости FPS от микро-гапа
-        let fps = (spd * 450000) / (gap - 3);
-        if (dash) fps *= 2;
-
-        const res = document.getElementById('calc-res');
-        res.innerHTML = "Требуемый FPS: " + Math.round(fps).toLocaleString();
-        res.style.display = "block";
+        if (!gap || gap <= 3) return alert("Введите гап > 3");
+        const speedMap = { "0.5": 0.75, "1": 0.9, "2": 1.1, "3": 1.35, "4": 1.65 };
+        let fps = (speedMap[document.getElementById('speed').value] * 450000) / (gap - 3);
+        if (document.getElementById('dash').checked) fps *= 2;
+        document.getElementById('res').innerText = "Требуемый FPS: " + Math.round(fps).toLocaleString();
     }
 </script>
-
 </body>
 </html>
