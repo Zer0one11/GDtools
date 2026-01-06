@@ -22,7 +22,6 @@
 
         .editor-header { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         input, select { background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 4px; width: 100%; box-sizing: border-box; outline: none; }
-        input:focus { border-color: var(--accent); }
 
         .table-wrap { max-height: 400px; overflow-y: auto; border: 1px solid var(--border); background: #000; margin: 15px 0; border-radius: 4px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; font-family: 'Consolas', monospace; }
@@ -30,14 +29,11 @@
         td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
         
         .hidden { display: none; }
-        .search-box { border-color: var(--border); margin-bottom: 15px; }
+        .search-box { border-color: var(--border); margin-bottom: 15px; border-bottom: 1px solid var(--accent); }
 
-        /* Модальное окно */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 999; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 999; }
         .modal-content { background: var(--panel); padding: 30px; border-radius: 12px; border: 1px solid var(--accent); max-width: 500px; width: 90%; text-align: center; }
-        .modal-content p { line-height: 1.6; color: #ccc; }
 
-        /* Подвал */
         .footer { margin-top: auto; padding: 30px; text-align: center; font-size: 0.85rem; color: var(--text-dim); border-top: 1px solid var(--border); width: 100%; }
         .footer strong { color: var(--accent); }
     </style>
@@ -55,10 +51,6 @@
 <div id="editor-page" class="container hidden">
     <h1>GMD Checker</h1>
     
-    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <button onclick="openHelp()" style="flex: 1; border-color: #555;">ИНСТРУКЦИЯ (ID ОБЪЕКТОВ)</button>
-    </div>
-
     <div class="file-zone" id="dropZone" onclick="document.getElementById('fileIn').click()">
         Кликните для загрузки .gmd файла
         <input type="file" id="fileIn" class="hidden" accept=".gmd" onchange="loadGMD(this)">
@@ -70,30 +62,30 @@
             <div><label style="font-size: 0.7rem; color: var(--accent);">ОПИСАНИЕ</label><input type="text" id="lvlDesc"></div>
         </div>
 
-        <input type="text" id="objSearch" class="search-box" placeholder="Поиск по ID или координатам..." oninput="renderObjects()">
+        <input type="text" id="objSearch" class="search-box" placeholder="Поиск объектов (ID, X, Y...)" oninput="renderObjects()">
         
         <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <button onclick="addObject()" style="background: #1a2e1a; border-color: #22c55e; flex: 1;">+ Добавить блок</button>
+            <button onclick="addObject()" style="background: #111; border-color: #22c55e; flex: 1;">+ Добавить блок</button>
             <button onclick="saveGMD()" style="background: var(--accent); color: #000; flex: 2;">СОХРАНИТЬ .GMD</button>
         </div>
 
         <div class="table-wrap">
             <table>
                 <thead>
-                    <tr>
-                        <th>ID</th><th>X</th><th>Y</th><th>Scale</th><th>Rot</th><th></th>
-                    </tr>
+                    <tr><th>ID</th><th>X</th><th>Y</th><th>Scale</th><th>Rot</th><th></th></tr>
                 </thead>
                 <tbody id="objList"></tbody>
             </table>
         </div>
+
+        <button onclick="openHelp()" style="width: 100%; border-color: #444; margin-top: 10px; font-size: 0.7rem; color: #888;">ИНСТРУКЦИЯ (ID ОБЪЕКТОВ)</button>
     </div>
-    <button style="width:100%; background:#18181b" onclick="location.reload()">Назад в меню</button>
+    
+    <button style="width:100%; margin-top:15px; background:#18181b" onclick="location.reload()">Назад в меню</button>
 </div>
 
 <div id="gap-page" class="container hidden">
     <h1>Gap Calculator</h1>
-    <p style="text-align: center; color: var(--text-dim);">Функционал калькулятора здесь...</p>
     <button style="width:100%; margin-top:20px; background:#18181b" onclick="showPage('main-menu')">Назад в меню</button>
 </div>
 
@@ -106,7 +98,7 @@
     <div class="modal-content">
         <h2 style="color: var(--accent); margin-top: 0;">ИНСТРУКЦИЯ</h2>
         <p>Чтобы узнать ID нужного объекта, скачайте мод <strong>Better Object Info</strong> в Geode, зайдите в редактор и выделите нужный блок для просмотра ID.</p>
-        <button style="width:100%; margin-top: 20px;" onclick="closeHelp()">ПОНЯТНО</button>
+        <button style="width:100%; margin-top: 20px; background: var(--accent); color: #000;" onclick="closeHelp()">ПОНЯТНО</button>
     </div>
 </div>
 
@@ -119,11 +111,9 @@
         document.getElementById(id).classList.remove('hidden');
     }
 
-    // Функции инструкции
     function openHelp() { document.getElementById('helpModal').classList.remove('hidden'); }
     function closeHelp() { document.getElementById('helpModal').classList.add('hidden'); }
 
-    // Загрузка GMD
     async function loadGMD(input) {
         const file = input.files[0];
         if (!file) return;
@@ -157,7 +147,7 @@
                 document.getElementById('edit-controls').classList.remove('hidden');
                 document.getElementById('dropZone').classList.add('hidden');
                 renderObjects();
-            } catch(e) { alert("Ошибка парсинга k4!"); }
+            } catch(e) { alert("Ошибка файла!"); }
         }
     }
 
@@ -168,17 +158,14 @@
 
         currentObjects.forEach((obj, idx) => {
             if (query && !JSON.stringify(obj).toLowerCase().includes(query)) return;
-            
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td><input type="text" value="${obj['1']}" onchange="updateObj(${idx}, '1', this.value)"></td>
-                <td><input type="text" value="${parseFloat(obj['2']).toFixed(1)}" onchange="updateObj(${idx}, '2', this.value)"></td>
-                <td><input type="text" value="${parseFloat(obj['3']).toFixed(1)}" onchange="updateObj(${idx}, '3', this.value)"></td>
+                <td><input type="text" value="${obj['2']}" onchange="updateObj(${idx}, '2', this.value)"></td>
+                <td><input type="text" value="${obj['3']}" onchange="updateObj(${idx}, '3', this.value)"></td>
                 <td><input type="text" value="${obj['128'] || '1'}" onchange="updateObj(${idx}, '128', this.value)"></td>
                 <td><input type="text" value="${obj['6'] || '0'}" onchange="updateObj(${idx}, '6', this.value)"></td>
-                <td style="text-align: right;">
-                    <button onclick="removeObj(${idx})" style="color:#ef4444; border:none; background:none; padding:0 5px;">✕</button>
-                </td>
+                <td style="text-align:right"><button onclick="removeObj(${idx})" style="color:#ef4444; border:none; background:none;">✕</button></td>
             `;
             list.appendChild(row);
         });
