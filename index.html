@@ -7,24 +7,39 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <style>
         :root { --bg: #050505; --panel: #0f0f0f; --accent: #a855f7; --text: #ffffff; --text-dim: #71717a; --border: #27272a; }
-        body { background-color: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .container { background: var(--panel); width: 95%; max-width: 1000px; margin: 20px 0; padding: 25px; border: 1px solid var(--border); border-radius: 8px; }
-        h1 { color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin: 0; font-size: 1.8rem; }
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        button { background: #000; color: #fff; border: 1px solid var(--border); padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        .container { background: var(--panel); width: 95%; max-width: 1000px; margin: 20px 0; padding: 25px; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 15px 0; font-size: 1.8rem; text-align: center; }
+        
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        
+        button { background: #000; color: #fff; border: 1px solid var(--border); padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; text-transform: uppercase; }
         button:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
-        .file-zone { border: 2px dashed var(--border); padding: 30px; text-align: center; color: var(--text-dim); cursor: pointer; margin-bottom: 20px; }
+        
+        .file-zone { border: 2px dashed var(--border); padding: 30px; text-align: center; color: var(--text-dim); cursor: pointer; margin-bottom: 20px; border-radius: 8px; }
+        .file-zone:hover { border-color: var(--accent); color: var(--text); background: rgba(168, 85, 247, 0.05); }
+
         .editor-header { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        input, select { background: #000; border: 1px solid var(--border); color: #fff; padding: 8px; border-radius: 4px; width: 100%; box-sizing: border-box; }
-        .table-wrap { max-height: 400px; overflow-y: auto; border: 1px solid var(--border); background: #000; margin: 15px 0; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; font-family: monospace; }
-        th { position: sticky; top: 0; background: #0a0a0a; color: var(--accent); padding: 10px; border-bottom: 1px solid var(--accent); }
-        td { padding: 5px 10px; border-bottom: 1px solid var(--border); }
-        .footer { margin-top: auto; padding: 20px; text-align: center; font-size: 0.8rem; color: var(--text-dim); }
-        .footer strong { color: var(--accent); }
+        input, select { background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 4px; width: 100%; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--accent); }
+
+        .table-wrap { max-height: 400px; overflow-y: auto; border: 1px solid var(--border); background: #000; margin: 15px 0; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; font-family: 'Consolas', monospace; }
+        th { position: sticky; top: 0; background: #0a0a0a; color: var(--accent); padding: 12px; border-bottom: 1px solid var(--accent); text-align: left; }
+        td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+        
         .hidden { display: none; }
-        .search-box { margin-bottom: 10px; border-color: var(--accent); }
-        .modal { background: rgba(0,0,0,0.9); position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+        .search-box { border-color: var(--border); margin-bottom: 15px; }
+
+        /* Модальное окно */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 999; }
+        .modal-content { background: var(--panel); padding: 30px; border-radius: 12px; border: 1px solid var(--accent); max-width: 500px; width: 90%; text-align: center; }
+        .modal-content p { line-height: 1.6; color: #ccc; }
+
+        /* Подвал */
+        .footer { margin-top: auto; padding: 30px; text-align: center; font-size: 0.85rem; color: var(--text-dim); border-top: 1px solid var(--border); width: 100%; }
+        .footer strong { color: var(--accent); }
     </style>
 </head>
 <body>
@@ -32,14 +47,18 @@
 <div id="main-menu" class="container">
     <h1>GDtools</h1>
     <div class="menu-grid">
-        <button onclick="showPage('editor-page')">GMD Editor / Checker</button>
+        <button onclick="showPage('editor-page')">GMD Checker / Editor</button>
         <button onclick="showPage('gap-page')">Gap Calculator</button>
     </div>
-    <button style="width:100%" onclick="showHelp()">ИНСТРУКЦИЯ (ID ОБЪЕКТОВ)</button>
 </div>
 
 <div id="editor-page" class="container hidden">
-    <h1>GMD Editor</h1>
+    <h1>GMD Checker</h1>
+    
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <button onclick="openHelp()" style="flex: 1; border-color: #555;">ИНСТРУКЦИЯ (ID ОБЪЕКТОВ)</button>
+    </div>
+
     <div class="file-zone" id="dropZone" onclick="document.getElementById('fileIn').click()">
         Кликните для загрузки .gmd файла
         <input type="file" id="fileIn" class="hidden" accept=".gmd" onchange="loadGMD(this)">
@@ -47,33 +66,35 @@
 
     <div id="edit-controls" class="hidden">
         <div class="editor-header">
-            <div><label>Название:</label><input type="text" id="lvlName"></div>
-            <div><label>Описание:</label><input type="text" id="lvlDesc"></div>
+            <div><label style="font-size: 0.7rem; color: var(--accent);">НАЗВАНИЕ</label><input type="text" id="lvlName"></div>
+            <div><label style="font-size: 0.7rem; color: var(--accent);">ОПИСАНИЕ</label><input type="text" id="lvlDesc"></div>
         </div>
 
         <input type="text" id="objSearch" class="search-box" placeholder="Поиск по ID или координатам..." oninput="renderObjects()">
         
-        <button onclick="addObject()" style="background: #1a2e1a; border-color: #22c55e; margin-bottom: 10px;">+ Добавить блок</button>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button onclick="addObject()" style="background: #1a2e1a; border-color: #22c55e; flex: 1;">+ Добавить блок</button>
+            <button onclick="saveGMD()" style="background: var(--accent); color: #000; flex: 2;">СОХРАНИТЬ .GMD</button>
+        </div>
 
         <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th><th>X</th><th>Y</th><th>Scale</th><th>Rot</th><th>Действия</th>
+                        <th>ID</th><th>X</th><th>Y</th><th>Scale</th><th>Rot</th><th></th>
                     </tr>
                 </thead>
                 <tbody id="objList"></tbody>
             </table>
         </div>
-
-        <button onclick="saveGMD()" style="width:100%; background: var(--accent); color: #000; font-size: 1.1rem;">СОХРАНИТЬ ФАЙЛ (.GMD)</button>
     </div>
-    <button style="width:100%; margin-top:10px; background:#18181b" onclick="location.reload()">Назад</button>
+    <button style="width:100%; background:#18181b" onclick="location.reload()">Назад в меню</button>
 </div>
 
 <div id="gap-page" class="container hidden">
     <h1>Gap Calculator</h1>
-    <button style="width:100%; margin-top:20px;" onclick="showPage('main-menu')">Назад</button>
+    <p style="text-align: center; color: var(--text-dim);">Функционал калькулятора здесь...</p>
+    <button style="width:100%; margin-top:20px; background:#18181b" onclick="showPage('main-menu')">Назад в меню</button>
 </div>
 
 <div class="footer">
@@ -81,11 +102,11 @@
     Special Thanks:
 </div>
 
-<div id="helpModal" class="modal hidden" onclick="this.classList.add('hidden')">
-    <div class="container" style="max-width: 500px;">
-        <h2>Инструкция</h2>
+<div id="helpModal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <h2 style="color: var(--accent); margin-top: 0;">ИНСТРУКЦИЯ</h2>
         <p>Чтобы узнать ID нужного объекта, скачайте мод <strong>Better Object Info</strong> в Geode, зайдите в редактор и выделите нужный блок для просмотра ID.</p>
-        <button style="width:100%" onclick="document.getElementById('helpModal').classList.add('hidden')">ЗАКРЫТЬ</button>
+        <button style="width:100%; margin-top: 20px;" onclick="closeHelp()">ПОНЯТНО</button>
     </div>
 </div>
 
@@ -98,8 +119,11 @@
         document.getElementById(id).classList.remove('hidden');
     }
 
-    function showHelp() { document.getElementById('helpModal').classList.remove('hidden'); }
+    // Функции инструкции
+    function openHelp() { document.getElementById('helpModal').classList.remove('hidden'); }
+    function closeHelp() { document.getElementById('helpModal').classList.add('hidden'); }
 
+    // Загрузка GMD
     async function loadGMD(input) {
         const file = input.files[0];
         if (!file) return;
@@ -108,8 +132,11 @@
         originalXML = parser.parseFromString(text, "text/xml");
 
         const getVal = (k) => {
-            const el = Array.from(originalXML.getElementsByTagName('k')).find(x => x.textContent === k);
-            return el ? el.nextElementSibling.textContent : "";
+            const keys = originalXML.getElementsByTagName('k');
+            for (let i = 0; i < keys.length; i++) {
+                if (keys[i].textContent === k) return keys[i].nextElementSibling.textContent;
+            }
+            return "";
         };
 
         document.getElementById('lvlName').value = getVal('k2');
@@ -117,17 +144,20 @@
 
         const k4 = getVal('k4');
         if (k4) {
-            const bin = atob(k4.replace(/-/g, '+').replace(/_/g, '/'));
-            const bytes = pako.inflate(new Uint8Array(bin.split('').map(c => c.charCodeAt(0))), { to: 'string' });
-            currentObjects = bytes.split(';').filter(s => s.length > 5).map(s => {
-                const p = s.split(',');
-                const d = {};
-                for(let i=0; i<p.length; i+=2) d[p[i]] = p[i+1];
-                return d;
-            });
-            document.getElementById('edit-controls').classList.remove('hidden');
-            document.getElementById('dropZone').classList.add('hidden');
-            renderObjects();
+            try {
+                const b64 = k4.replace(/-/g, '+').replace(/_/g, '/');
+                const bin = atob(b64);
+                const bytes = pako.inflate(new Uint8Array(bin.split('').map(c => c.charCodeAt(0))), { to: 'string' });
+                currentObjects = bytes.split(';').filter(s => s.length > 5).map(s => {
+                    const p = s.split(',');
+                    const d = {};
+                    for(let i=0; i<p.length; i+=2) d[p[i]] = p[i+1];
+                    return d;
+                });
+                document.getElementById('edit-controls').classList.remove('hidden');
+                document.getElementById('dropZone').classList.add('hidden');
+                renderObjects();
+            } catch(e) { alert("Ошибка парсинга k4!"); }
         }
     }
 
@@ -142,13 +172,12 @@
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td><input type="text" value="${obj['1']}" onchange="updateObj(${idx}, '1', this.value)"></td>
-                <td><input type="text" value="${obj['2']}" onchange="updateObj(${idx}, '2', this.value)"></td>
-                <td><input type="text" value="${obj['3']}" onchange="updateObj(${idx}, '3', this.value)"></td>
+                <td><input type="text" value="${parseFloat(obj['2']).toFixed(1)}" onchange="updateObj(${idx}, '2', this.value)"></td>
+                <td><input type="text" value="${parseFloat(obj['3']).toFixed(1)}" onchange="updateObj(${idx}, '3', this.value)"></td>
                 <td><input type="text" value="${obj['128'] || '1'}" onchange="updateObj(${idx}, '128', this.value)"></td>
                 <td><input type="text" value="${obj['6'] || '0'}" onchange="updateObj(${idx}, '6', this.value)"></td>
-                <td>
-                    <button onclick="alert('Raw Data: '+JSON.stringify(currentObjects[${idx}]))">👁️</button>
-                    <button onclick="removeObj(${idx})" style="color:#ef4444">X</button>
+                <td style="text-align: right;">
+                    <button onclick="removeObj(${idx})" style="color:#ef4444; border:none; background:none; padding:0 5px;">✕</button>
                 </td>
             `;
             list.appendChild(row);
@@ -157,18 +186,18 @@
 
     function updateObj(idx, key, val) { currentObjects[idx][key] = val; }
     function removeObj(idx) { currentObjects.splice(idx, 1); renderObjects(); }
-    function addObject() { currentObjects.push({"1":"1","2":"0","3":"0"}); renderObjects(); }
+    function addObject() { currentObjects.push({"1":"1","2":"0","3":"0","128":"1"}); renderObjects(); }
 
     function saveGMD() {
-        // Сборка строки объектов
         const objStr = currentObjects.map(obj => Object.entries(obj).map(e => e.join(',')).join(',')).join(';') + ';';
         const compressed = pako.deflate(objStr);
         const b64 = btoa(String.fromCharCode.apply(null, compressed)).replace(/\+/g, '-').replace(/\//g, '_');
 
-        // Обновление XML
-        const setVal = (k, newVal) => {
-            const el = Array.from(originalXML.getElementsByTagName('k')).find(x => x.textContent === k);
-            if(el) el.nextElementSibling.textContent = newVal;
+        const keys = originalXML.getElementsByTagName('k');
+        const setVal = (k, val) => {
+            for (let i = 0; i < keys.length; i++) {
+                if (keys[i].textContent === k) keys[i].nextElementSibling.textContent = val;
+            }
         };
 
         setVal('k2', document.getElementById('lvlName').value);
