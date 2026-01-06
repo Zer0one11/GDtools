@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>GDtools - Gap Calculator</title>
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container { text-align: center; background: #222; padding: 40px; border-radius: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.5); width: 400px; }
+        h1 { color: #4CAF50; margin-bottom: 10px; }
+        .author { font-size: 0.9em; color: #888; margin-bottom: 5px; }
+        .special-thanks { font-size: 0.8em; color: #555; margin-bottom: 30px; }
+        
+        button, select, input { 
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: none; font-size: 16px; 
+        }
+        button { background: #4CAF50; color: white; cursor: pointer; transition: 0.3s; font-weight: bold; }
+        button:hover { background: #45a049; }
+        
+        input, select { background: #333; color: white; border: 1px solid #444; width: calc(100% - 26px); }
+        
+        .checkbox-container { display: flex; align-items: center; justify-content: center; margin: 15px 0; }
+        .checkbox-container input { width: auto; margin-right: 10px; }
+
+        #result { margin-top: 20px; font-size: 1.2em; font-weight: bold; color: #ffd700; padding: 15px; background: #2a2a2a; border-radius: 5px; display: none; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="main-menu" class="container">
+    <h1>GDtools</h1>
+    <div class="author">Автор: HELFZz</div>
+    <div class="special-thanks">Special Thanks: </div>
+    <button onclick="showCalculator()">Gap Calculator</button>
+</div>
+
+<div id="calculator-page" class="container hidden">
+    <h1>Gap Calculator</h1>
+    <input type="number" id="gapInput" placeholder="Введите размер гапа (напр. 3.0001)" step="0.00000001">
+    
+    <select id="waveType">
+        <option value="3">Обычная волна</option>
+        <option value="6">Мини волна</option>
+    </select>
+    
+    <select id="speed">
+        <option value="0.5">Скорость 0.5x</option>
+        <option value="1">Скорость 1x</option>
+        <option value="2">Скорость 2x</option>
+        <option value="3">Скорость 3x</option>
+        <option value="4">Скорость 4x</option>
+    </select>
+    
+    <div class="checkbox-container">
+        <input type="checkbox" id="dashOrb">
+        <label for="dashOrb">With Dash Orb (*2 FPS)</label>
+    </div>
+    
+    <button onclick="calculateFPS()">Рассчитать FPS</button>
+    <button style="background:#555" onclick="showMenu()">Назад</button>
+    
+    <div id="result"></div>
+</div>
+
+<script>
+    function showCalculator() {
+        document.getElementById('main-menu').classList.add('hidden');
+        document.getElementById('calculator-page').classList.remove('hidden');
+    }
+
+    function showMenu() {
+        document.getElementById('calculator-page').classList.add('hidden');
+        document.getElementById('main-menu').classList.remove('hidden');
+        document.getElementById('result').style.display = 'none';
+    }
+
+    function calculateFPS() {
+        const gap = parseFloat(document.getElementById('gapInput').value);
+        const k_base = parseFloat(document.getElementById('waveType').value);
+        const speed = parseFloat(document.getElementById('speed').value);
+        const dashOrb = document.getElementById('dashOrb').checked;
+
+        if (isNaN(gap) || gap <= 3) {
+            alert("Пожалуйста, введите корректный гап (больше 3)");
+            return;
+        }
+
+        // Базовая формула: FPS = (Скорость * Множитель) / (Гап - Хитбокс)
+        // Эти коэффициенты k подобраны под физику GD
+        const k_map = { 0.5: 0.75, 1: 0.9, 2: 1.1, 3: 1.35, 4: 1.65 };
+        let resultFps = (k_map[speed] * 500000) / (gap - 3);
+
+        if (dashOrb) {
+            resultFps = resultFps * 2;
+        }
+
+        const resDiv = document.getElementById('result');
+        resDiv.innerHTML = `Требуемый FPS: <br> ${Math.round(resultFps).toLocaleString()}`;
+        resDiv.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
