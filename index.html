@@ -3,123 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GDtools - GMD Checker & Gap Calc</title>
+    <title>GDtools - GMD Checker</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <style>
         :root {
             --bg: #050505;
-            --panel: #111111;
-            --accent: #8b5cf6;
-            --text: #e5e7eb;
-            --text-dim: #666666;
-            --border: #222222;
+            --panel: #0f0f0f;
+            --accent: #a855f7;
+            --accent-glow: rgba(168, 85, 247, 0.4);
+            --text: #ffffff;
+            --text-dim: #71717a;
+            --border: #27272a;
         }
 
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             margin: 0;
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: center;
             min-height: 100vh;
         }
 
         .container {
             background: var(--panel);
-            width: 90%;
+            width: 95%;
             max-width: 900px;
-            margin-top: 40px;
+            margin: 40px 0;
             padding: 30px;
             border: 1px solid var(--border);
-            box-shadow: 0 10px 50px rgba(0,0,0,0.8);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         h1 {
             color: var(--accent);
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             margin: 0;
-            font-size: 2.2em;
+            font-size: 2rem;
+            text-shadow: 0 0 20px var(--accent-glow);
         }
 
         .author-box {
-            margin-bottom: 25px;
-            font-size: 0.8em;
+            margin-bottom: 24px;
+            font-size: 0.75rem;
             color: var(--text-dim);
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
         }
 
         .author-box strong { color: var(--accent); }
 
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
         button {
             background: #000;
-            color: var(--text);
+            color: #fff;
             border: 1px solid var(--border);
-            padding: 15px;
-            font-weight: bold;
+            padding: 14px;
+            font-weight: 700;
             text-transform: uppercase;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 6px;
         }
 
         button:hover {
             border-color: var(--accent);
             color: var(--accent);
-            background: #0a0a0a;
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: translateY(-1px);
         }
 
         .file-zone {
-            border: 1px dashed var(--border);
-            padding: 40px;
+            border: 2px dashed var(--border);
+            padding: 60px 20px;
             text-align: center;
             color: var(--text-dim);
             cursor: pointer;
+            border-radius: 8px;
             margin-bottom: 20px;
+            transition: 0.3s;
         }
 
-        .file-zone:hover { border-color: var(--accent); color: var(--text); }
+        .file-zone:hover {
+            border-color: var(--accent);
+            background: rgba(168, 85, 247, 0.05);
+            color: var(--text);
+        }
 
         .table-wrap {
-            max-height: 450px;
+            max-height: 500px;
             overflow-y: auto;
             margin-top: 20px;
             border: 1px solid var(--border);
+            border-radius: 6px;
             background: #000;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-family: 'Consolas', monospace;
-            font-size: 0.85em;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.8rem;
         }
 
         th {
             position: sticky; top: 0;
             background: #0a0a0a;
             color: var(--accent);
-            padding: 10px;
+            padding: 12px;
             text-align: left;
             border-bottom: 1px solid var(--accent);
+            z-index: 10;
         }
 
-        td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: #ccc; }
-        tr:hover { background: #161616; }
+        td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: #d1d1d6; }
+        tr:hover { background: rgba(168, 85, 247, 0.1); }
 
         .hidden { display: none; }
-        .stats { color: var(--accent); font-size: 0.9em; margin-bottom: 10px; font-weight: bold; }
-
-        /* Calc Styles */
-        input, select {
+        .stats { color: var(--accent); font-size: 0.85rem; margin-bottom: 8px; font-family: monospace; }
+        
+        input[type="number"], select {
             width: 100%; padding: 12px;
-            background: #000; border: 1px solid var(--border);
-            color: white; margin: 8px 0;
+            background: #09090b; border: 1px solid var(--border);
+            color: white; margin: 8px 0; border-radius: 4px;
         }
     </style>
 </head>
@@ -128,7 +140,7 @@
 <div id="main-menu" class="container">
     <h1>GDtools</h1>
     <div class="author-box">
-        Автор: <strong>HELFZz</strong> | Special Thanks: 
+        By <strong>HELFZz</strong> | Special Thanks: 
     </div>
     <div class="menu-grid">
         <button onclick="showPage('checker-page')">GMD Checker</button>
@@ -138,10 +150,10 @@
 
 <div id="checker-page" class="container hidden">
     <h1>GMD Checker</h1>
-    <div class="author-box">Анализатор блоков уровня</div>
+    <div class="author-box">Object Data Extractor</div>
     
     <div class="file-zone" onclick="document.getElementById('fileInput').click()">
-        Нажмите, чтобы загрузить .gmd файл
+        Загрузите .gmd файл для анализа каждого блока
         <input type="file" id="fileInput" class="hidden" accept=".gmd" onchange="processFile(this)">
     </div>
 
@@ -151,29 +163,29 @@
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>X Pos</th>
-                    <th>Y Pos</th>
-                    <th>Scale</th>
-                    <th>Rot</th>
+                    <th>OBJ ID</th>
+                    <th>X POS</th>
+                    <th>Y POS</th>
+                    <th>SCALE</th>
+                    <th>ROT</th>
                 </tr>
             </thead>
             <tbody id="obj-list">
-                <tr><td colspan="5" style="text-align:center; color:#444;">Список пуст</td></tr>
+                <tr><td colspan="5" style="text-align:center; color:#3f3f46;">Ожидание файла...</td></tr>
             </tbody>
         </table>
     </div>
     
-    <button style="width:100%; margin-top:20px;" onclick="showPage('main-menu')">Назад</button>
+    <button style="width:100%; margin-top:24px; background: #18181b;" onclick="showPage('main-menu')">Назад</button>
 </div>
 
 <div id="gap-page" class="container hidden">
     <h1>Gap Calculator</h1>
-    <div class="author-box">Расчет FPS</div>
-    <input type="number" id="gapSize" placeholder="Размер гапа (например, 3.0001)" step="0.00000001">
+    <div class="author-box">Calculations</div>
+    <input type="number" id="gapSize" placeholder="Gap size (e.g. 3.0001)">
     <select id="mode">
-        <option value="3">Normal Wave</option>
-        <option value="6">Mini Wave</option>
+        <option value="3">Big Wave (3.0)</option>
+        <option value="6">Mini Wave (6.0)</option>
     </select>
     <select id="speed">
         <option value="1">1x Speed</option>
@@ -182,27 +194,18 @@
         <option value="3">3x Speed</option>
         <option value="4">4x Speed</option>
     </select>
-    <div style="margin: 10px 0;"><input type="checkbox" id="dash"> <label>With Dash Orb (*2)</label></div>
-    <button onclick="calcGap()" style="width: 100%;">Рассчитать</button>
-    <div id="res" style="margin-top:20px; color:var(--accent); font-weight:bold;"></div>
-    <button style="width:100%; margin-top:20px;" onclick="showPage('main-menu')">Назад</button>
+    <div style="margin: 12px 0; font-size: 0.9rem;">
+        <input type="checkbox" id="dash"> <label for="dash">With Dash Orb (*2 FPS)</label>
+    </div>
+    <button onclick="calcGap()" style="width: 100%;">Calculate</button>
+    <div id="res" style="margin-top:20px; color:var(--accent); font-weight:800; font-size: 1.2rem;"></div>
+    <button style="width:100%; margin-top:24px; background: #18181b;" onclick="showPage('main-menu')">Назад</button>
 </div>
 
 <script>
     function showPage(id) {
         document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
-    }
-
-    // Исправленная логика поиска данных в XML
-    function getGMDValue(xml, key) {
-        const keys = xml.getElementsByTagName('k');
-        for (let i = 0; i < keys.length; i++) {
-            if (keys[i].textContent === key) {
-                return keys[i].nextElementSibling.textContent;
-            }
-        }
-        return null;
     }
 
     async function processFile(input) {
@@ -213,19 +216,26 @@
         const parser = new DOMParser();
         const xml = parser.parseFromString(text, "text/xml");
 
-        [span_0](start_span)// Исправленный поиск k4 и k2[span_0](end_span)
-        const levelName = getGMDValue(xml, 'k2') || "Unnamed";
-        const k4 = getGMDValue(xml, 'k4');
+        // Универсальный поиск k4 и k2 через обход всех узлов
+        let levelName = "Unnamed";
+        let k4Data = "";
 
-        if (!k4) {
-            alert("Ошибка: Данные объектов (k4) не найдены в файле.");
+        const keys = xml.getElementsByTagName('k');
+        for (let i = 0; i < keys.length; i++) {
+            if (keys[i].textContent === 'k2') levelName = keys[i].nextElementSibling.textContent;
+            if (keys[i].textContent === 'k4') k4Data = keys[i].nextElementSibling.textContent;
+        }
+
+        if (!k4Data) {
+            alert("Ошибка: Данные k4 не найдены. Убедитесь, что это корректный .gmd файл.");
             return;
         }
 
-        document.getElementById('file-info').innerText = "Уровень: " + levelName;
+        document.getElementById('file-info').innerText = "LEVEL: " + levelName.toUpperCase();
 
         try {
-            const b64 = k4.replace(/-/g, '+').replace(/_/g, '/');
+            // GD Base64 -> Gzip
+            const b64 = k4Data.replace(/-/g, '+').replace(/_/g, '/');
             const bin = atob(b64);
             const bytes = new Uint8Array(bin.length);
             for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
@@ -236,32 +246,36 @@
             const list = document.getElementById('obj-list');
             list.innerHTML = "";
 
-            for(let i = 0; i < Math.min(objects.length, 2000); i++) {
-                if(objects[i].length < 5) continue;
-                const p = objects[i].split(',');
-                const data = {};
-                for (let j = 0; j < p.length; j += 2) data[p[j]] = p[j+1];
+            // Парсим объекты
+            objects.forEach((objStr, index) => {
+                if (objStr.length < 5) return;
+                const p = objStr.split(',');
+                const d = {};
+                for (let j = 0; j < p.length; j += 2) d[p[j]] = p[j+1];
 
+                // Выводим данные: ID (1), X (2), Y (3), Scale (128), Rotation (6)
                 list.insertAdjacentHTML('beforeend', `<tr>
-                    <td>${data['1'] || '?'}</td>
-                    <td>${parseFloat(data['2'] || 0).toFixed(2)}</td>
-                    <td>${parseFloat(data['3'] || 0).toFixed(2)}</td>
-                    <td>${data['128'] || '1'}</td>
-                    <td>${data['6'] || '0'}°</td>
+                    <td>${d['1'] || '?'}</td>
+                    <td>${parseFloat(d['2'] || 0).toFixed(2)}</td>
+                    <td>${parseFloat(d['3'] || 0).toFixed(2)}</td>
+                    <td>${d['128'] || d['32'] || '1'}</td>
+                    <td>${d['6'] || '0'}°</td>
                 </tr>`);
-            }
+            });
+            
+            document.getElementById('file-info').innerText += ` | OBJECTS: ${objects.length - 1}`;
         } catch (e) {
-            alert("Ошибка при распаковке k4. Возможно, файл поврежден.");
+            alert("Ошибка декодирования k4: " + e.message);
         }
     }
 
     function calcGap() {
         const gap = parseFloat(document.getElementById('gapSize').value);
-        if (!gap || gap <= 3) return alert("Введите гап > 3");
+        if (!gap) return;
         const speedMap = { "0.5": 0.75, "1": 0.9, "2": 1.1, "3": 1.35, "4": 1.65 };
-        let fps = (speedMap[document.getElementById('speed').value] * 450000) / (gap - 3);
+        let fps = (speedMap[document.getElementById('speed').value] * 450000) / Math.abs(gap - 3);
         if (document.getElementById('dash').checked) fps *= 2;
-        document.getElementById('res').innerText = "Требуемый FPS: " + Math.round(fps).toLocaleString();
+        document.getElementById('res').innerText = "FPS: " + Math.round(fps).toLocaleString();
     }
 </script>
 </body>
