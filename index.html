@@ -34,20 +34,12 @@
         .hidden { display: none !important; }
         .footer { margin-top: auto; padding: 20px; text-align: center; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid var(--border); width: 100%; }
         
-        #mobile-warning { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-        
-        /* Стиль для инструкции */
+        /* Стили инструкций */
         .help-box { margin-top: 25px; padding: 15px; border-left: 4px solid var(--accent); background: #111; font-size: 0.85rem; line-height: 1.4; color: #ccc; }
         .help-box b { color: var(--accent); }
     </style>
 </head>
 <body>
-
-<div id="mobile-warning" class="hidden">
-    <h2>📱 Внимание</h2>
-    <p>Для корректной работы <b>GDtools</b> на смартфоне включите <b>"Версию для ПК"</b>.</p>
-    <button onclick="document.getElementById('mobile-warning').classList.add('hidden')" style="margin-top: 20px; border-color: var(--accent);">Понятно</button>
-</div>
 
 <div id="main-menu" class="container">
     <h1>GDtools</h1>
@@ -63,8 +55,8 @@
 <div id="wolfram-page" class="container hidden">
     <h1 style="color: var(--wolfram);">Wolfram Solver</h1>
     <div style="max-width: 600px; margin: 0 auto;">
-        <label>Ваш математический запрос</label>
-        <input type="text" id="wolframInput" placeholder="lim x->0 sin(x)/x или 10^10^10">
+        <label>Запрос</label>
+        <input type="text" id="wolframInput" placeholder="Пример: 10^10^10">
         <button onclick="solveWolfram()" style="width: 100%; background: var(--wolfram); color: #000;">РЕШИТЬ</button>
     </div>
     <button style="width:100%; margin-top:30px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
@@ -75,27 +67,36 @@
     <div style="max-width: 500px; margin: 0 auto;">
         <label>Размер гапа</label>
         <input type="number" id="gapSize" step="0.0000000001" placeholder="3.0001">
+        
         <label>Режим волны</label>
         <select id="gapMode"><option value="3">Обычная волна</option><option value="3">Мини волна</option></select>
+
         <label>Скорость</label>
         <select id="gapSpeed">
             <option value="1">1x Speed</option><option value="0.5">0.5x Speed</option>
             <option value="2">2x Speed</option><option value="3">3x Speed</option><option value="4">4x Speed</option>
         </select>
+
         <div style="margin-bottom: 15px;">
             <input type="checkbox" id="gapDash" style="width: auto; margin-right: 10px;">
             <label style="display: inline;">Dash Orb активен?</label>
         </div>
+
         <button onclick="calculateGap()" style="width: 100%; background: var(--accent); color: #000;">Рассчитать FPS</button>
         <div id="gapRes" style="text-align: center; font-size: 2rem; margin-top: 20px; color: var(--accent); font-weight: bold;"></div>
+        
+        <div class="help-box">
+            <b>ИНСТРУКЦИЯ:</b><br>
+            Для того чтобы узнать размер <b>gap'a</b>, скачайте мод <b>Better Object Info</b> в Geode, выделите объект и посмотрите <b>Position</b> объекта.
+        </div>
     </div>
     <button style="width:100%; margin-top:30px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
 </div>
 
 <div id="editor-page" class="container hidden">
     <h1>GMD Editor</h1>
-    <div id="dropZone" class="file-zone" onclick="document.getElementById('fileIn').click()" style="border: 2px dashed #333; padding: 40px; text-align: center; cursor: pointer; color: #555;">
-        Кликните, чтобы загрузить .gmd файл
+    <div id="dropZone" class="file-zone" onclick="document.getElementById('fileIn').click()" style="border: 2px dashed #333; padding: 40px; text-align: center; cursor: pointer;">
+        Загрузить .gmd файл
         <input type="file" id="fileIn" class="hidden" accept=".gmd" onchange="loadGMD(this)">
     </div>
     <div id="editor-ui" class="hidden">
@@ -103,26 +104,20 @@
             <div><label>Название</label><input type="text" id="lvlName"></div>
             <div><label>Описание</label><input type="text" id="lvlDesc"></div>
         </div>
-        <button onclick="saveGMD()" style="width: 100%; background: var(--accent); color: #000; margin-bottom: 10px;">СОХРАНИТЬ .GMD</button>
+        <button onclick="saveGMD()" style="width: 100%; background: var(--accent); color: #000; margin-bottom: 10px;">СОХРАНИТЬ</button>
         <div class="table-wrap"><table><thead><tr><th>ID</th><th>X</th><th>Y</th><th>Scale</th><th>Rot</th><th></th></tr></thead><tbody id="objList"></tbody></table></div>
         
         <div class="help-box">
             <b>ИНСТРУКЦИЯ:</b><br>
-            Чтобы узнать ID нужного объекта, скачайте мод <b>Better Object Info</b> в Geode. Зайдите в редактор Geometry Dash, выделите нужный блок, и мод покажет его ID. Введите этот ID в таблицу выше для замены.
+            Чтобы узнать ID нужного объекта, скачайте мод <b>Better Object Info</b> в Geode. Зайдите в редактор Geometry Dash, выделите нужный блок, и мод покажет его ID.
         </div>
     </div>
-    <button style="width:100%; margin-top:15px; background:#18181b" onclick="location.reload()">Назад в меню</button>
+    <button style="width:100%; margin-top:15px; background:#18181b" onclick="location.reload()">Назад</button>
 </div>
 
 <div class="footer">GDtools | Автор: <strong>HELFZz</strong></div>
 
 <script>
-    window.onload = () => {
-        if (/Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth < 800) {
-            document.getElementById('mobile-warning').classList.remove('hidden');
-        }
-    };
-
     function showPage(id) {
         document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
