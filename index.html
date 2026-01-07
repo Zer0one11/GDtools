@@ -33,10 +33,10 @@
     <div class="menu-grid">
         <button onclick="showPage('editor-page')">GMD Editor</button>
         <button onclick="showPage('gap-page')">Gap Calculator</button>
-        <button onclick="showPage('finder-page')" style="color: var(--secondary); border-color: var(--secondary);">Gap Finder (FPS to Gap)</button>
+        <button onclick="showPage('finder-page')">Gap Finder</button>
         <button onclick="window.open('https://zcb3-web.vercel.app/', '_blank')">ZCB3 Web</button>
         <button onclick="window.open('https://conv.nattie.dev/', '_blank')">Macro Converter</button>
-        <button class="full-width" style="color:var(--wolfram)" onclick="showPage('wolfram-page')">WolframAlpha Solver</button>
+        <button class="full-width" onclick="showPage('wolfram-page')">WolframAlpha Solver</button>
     </div>
 </div>
 
@@ -49,10 +49,10 @@
             <input type="checkbox" id="finderDash" style="width: auto; margin-right: 10px;">
             <label style="display: inline;">Dash Orb активен?</label>
         </div>
-        <button onclick="findGaps()" style="width: 100%; background: var(--secondary); color: #fff;">Рассчитать зазоры</button>
+        <button onclick="findGaps()" style="width: 100%; background: var(--accent); color: #000;">Рассчитать зазоры</button>
     </div>
 
-    <div class="res-grid" id="finderResults" class="hidden">
+    <div class="res-grid" id="finderResults">
         <div>
             <h3 style="text-align:center; color: var(--accent);">Big Wave</h3>
             <div class="table-wrap">
@@ -114,9 +114,9 @@
 </div>
 
 <div id="wolfram-page" class="container hidden">
-    <h1 style="color:var(--wolfram)">Wolfram Solver</h1>
-    <input type="text" id="wolfInput" placeholder="Введите запрос...">
-    <button onclick="window.open('https://www.wolframalpha.com/input/?i='+encodeURIComponent(document.getElementById('wolfInput').value))" style="width:100%; background:var(--wolfram); color:#000">РЕШИТЬ</button>
+    <h1>WolframAlpha Solver</h1>
+    <input type="text" id="wolfInput" placeholder="Введите математический запрос...">
+    <button onclick="window.open('https://www.wolframalpha.com/input/?i='+encodeURIComponent(document.getElementById('wolfInput').value))" style="width:100%; background:var(--accent); color:#000">РЕШИТЬ</button>
     <button style="width:100%; margin-top:30px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
 </div>
 
@@ -131,29 +131,23 @@
         document.getElementById(id).classList.remove('hidden');
     }
 
-    // GAP FINDER LOGIC
     function findGaps() {
         let fps = parseFloat(document.getElementById('targetFps').value);
         if (!fps || fps <= 0) return alert("Введите корректный FPS");
-        
         if (document.getElementById('finderDash').checked) fps *= 2;
-
         const fillTable = (tbodyId, mode) => {
             const tbody = document.getElementById(tbodyId);
             tbody.innerHTML = "";
             Object.keys(constants[mode]).forEach(speed => {
                 const k = constants[mode][speed];
                 const gap = (k / fps) + 3;
-                const row = `<tr><td>${speed}x</td><td><b>${gap.toFixed(10)}</b></td></tr>`;
-                tbody.innerHTML += row;
+                tbody.innerHTML += `<tr><td>${speed}x</td><td><b>${gap.toFixed(10)}</b></td></tr>`;
             });
         };
-
         fillTable("bigWaveTable", "normal");
         fillTable("miniWaveTable", "mini");
     }
 
-    // PREVIOUS LOGIC (GAP CALC, EDITOR, WOLFRAM)
     function calculatePreciseGap() {
         const gap = parseFloat(document.getElementById('gapSize').value);
         const mode = document.getElementById('gapMode').value;
