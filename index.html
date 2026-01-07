@@ -23,7 +23,6 @@
         .hidden { display: none !important; }
         .help-box { margin-top: 25px; padding: 15px; border-left: 4px solid var(--accent); background: #111; font-size: 0.85rem; line-height: 1.4; color: #ccc; }
         .help-box b { color: var(--accent); }
-        .footer { margin-top: auto; padding: 20px; text-align: center; font-size: 0.8rem; color: var(--text-dim); }
     </style>
 </head>
 <body>
@@ -31,7 +30,7 @@
 <div id="main-menu" class="container">
     <h1>GDtools</h1>
     <div class="menu-grid">
-        <button onclick="showPage('editor-page')">GMD Checker / Editor</button>
+        <button onclick="showPage('editor-page')">GMD Editor</button>
         <button onclick="showPage('gap-page')">Gap Calculator</button>
         <button onclick="window.open('https://zcb3-web.vercel.app/', '_blank')">ZCB3 Web</button>
         <button onclick="window.open('https://conv.nattie.dev/', '_blank')">Macro Converter</button>
@@ -39,46 +38,9 @@
     </div>
 </div>
 
-<div id="gap-page" class="container hidden">
-    <h1>Gap Calculator</h1>
-    <div style="max-width: 500px; margin: 0 auto;">
-        <label>Размер гапа</label>
-        <input type="number" id="gapSize" step="0.0000000001" placeholder="Например: 3.12345">
-        
-        <label>Режим волны</label>
-        <select id="gapMode">
-            <option value="normal">Обычная волна</option>
-            <option value="mini">Мини волна</option>
-        </select>
-
-        <label>Скорость</label>
-        <select id="gapSpeed">
-            <option value="0.5">0.5x Speed</option>
-            <option value="1" selected>1x Speed</option>
-            <option value="2">2x Speed</option>
-            <option value="3">3x Speed</option>
-            <option value="4">4x Speed</option>
-        </select>
-
-        <div style="margin-bottom: 15px;">
-            <input type="checkbox" id="gapDash" style="width: auto; margin-right: 10px;">
-            <label style="display: inline;">Dash Orb активен?</label>
-        </div>
-
-        <button onclick="calculatePreciseGap()" style="width: 100%; background: var(--accent); color: #000;">Рассчитать FPS</button>
-        <div id="gapRes" style="text-align: center; font-size: 2rem; margin-top: 20px; color: var(--accent); font-weight: bold;"></div>
-        
-        <div class="help-box">
-            <b>ИНСТРУКЦИЯ:</b><br>
-            Для того чтобы узнать размер <b>gap'a</b>, скачайте мод <b>More Object Info</b> в Geode, выделите объект и посмотрите <b>Position</b> объекта.
-        </div>
-    </div>
-    <button style="width:100%; margin-top:30px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
-</div>
-
 <div id="editor-page" class="container hidden">
     <h1>GMD Editor</h1>
-    <div id="dropZone" class="file-zone" onclick="document.getElementById('fileIn').click()" style="border: 2px dashed #333; padding: 40px; text-align: center; cursor: pointer; color: #555;">
+    <div id="dropZone" style="border: 2px dashed #333; padding: 40px; text-align: center; cursor: pointer; color: #555;" onclick="document.getElementById('fileIn').click()">
         Загрузить .gmd файл
         <input type="file" id="fileIn" class="hidden" accept=".gmd" onchange="loadGMD(this)">
     </div>
@@ -87,9 +49,8 @@
             <div><label>Название</label><input type="text" id="lvlName"></div>
             <div><label>Описание</label><input type="text" id="lvlDesc"></div>
         </div>
-        <button onclick="saveGMD()" style="width: 100%; background: var(--accent); color: #000; margin-bottom: 10px;">СОХРАНИТЬ</button>
+        <button onclick="saveGMD()" style="width: 100%; background: var(--accent); color: #000; margin-bottom: 10px;">СОХРАНИТЬ .GMD</button>
         <div class="table-wrap"><table><thead><tr><th>ID</th><th>X</th><th>Y</th><th>Scale</th><th>Rot</th><th></th></tr></thead><tbody id="objList"></tbody></table></div>
-        
         <div class="help-box">
             <b>ИНСТРУКЦИЯ:</b><br>
             Чтобы узнать ID нужного объекта, скачайте мод <b>More Object Info</b> в Geode. Зайдите в редактор Geometry Dash, выделите нужный блок, и мод покажет его ID.
@@ -98,20 +59,43 @@
     <button style="width:100%; margin-top:15px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
 </div>
 
-<div id="wolfram-page" class="container hidden">
-    <h1 style="color:var(--wolfram)">Wolfram Solver</h1>
-    <input type="text" id="wolfInput" placeholder="Введите запрос...">
-    <button onclick="window.open('https://www.wolframalpha.com/input/?i='+encodeURIComponent(document.getElementById('wolfInput').value))" style="width:100%; background:var(--wolfram); color:#000">РЕШИТЬ</button>
+<div id="gap-page" class="container hidden">
+    <h1>Gap Calculator</h1>
+    <div style="max-width: 500px; margin: 0 auto;">
+        <label>Размер гапа</label>
+        <input type="number" id="gapSize" step="0.0000000001" placeholder="Например: 3.12345">
+        <label>Режим волны</label>
+        <select id="gapMode"><option value="normal">Обычная волна</option><option value="mini">Мини волна</option></select>
+        <label>Скорость</label>
+        <select id="gapSpeed">
+            <option value="0.5">0.5x Speed</option><option value="1" selected>1x Speed</option>
+            <option value="2">2x Speed</option><option value="3">3x Speed</option><option value="4">4x Speed</option>
+        </select>
+        <div style="margin-bottom: 15px;"><input type="checkbox" id="gapDash" style="width: auto; margin-right: 10px;"><label style="display: inline;">Dash Orb активен?</label></div>
+        <button onclick="calculatePreciseGap()" style="width: 100%; background: var(--accent); color: #000;">Рассчитать FPS</button>
+        <div id="gapRes" style="text-align: center; font-size: 2rem; margin-top: 20px; color: var(--accent); font-weight: bold;"></div>
+        <div class="help-box"><b>ИНСТРУКЦИЯ:</b><br>Для того чтобы узнать размер <b>gap'a</b>, скачайте мод <b>More Object Info</b> в Geode, выделите объект и посмотрите <b>Position</b> объекта.</div>
+    </div>
     <button style="width:100%; margin-top:30px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
 </div>
 
-<div class="footer">GDtools | Автор: <strong>HELFZz</strong></div>
+<div id="wolfram-page" class="container hidden">
+    <h1 style="color:var(--wolfram)">Wolfram Solver</h1>
+    <input type="text" id="wolfInput" placeholder="Введите запрос (например 10^10^10)">
+    <button onclick="window.open('https://www.wolframalpha.com/input/?i='+encodeURIComponent(document.getElementById('wolfInput').value))" style="width:100%; background:var(--wolfram); color:#000">РЕШИТЬ</button>
+    <button style="width:100%; margin-top:30px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
+</div>
 
 <script>
     const constants = {
         normal: { "0.5": 251.159363, "1": 311.579742, "2": 387.421265, "3": 468.001038, "4": 575.999756 },
         mini: { "0.5": 502.321411, "1": 623.161926, "2": 774.843140, "3": 936.003967, "4": 1152.005615 }
     };
+
+    function showPage(id) {
+        document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
 
     function calculatePreciseGap() {
         const gap = parseFloat(document.getElementById('gapSize').value);
@@ -125,50 +109,71 @@
         document.getElementById('gapRes').innerText = Math.round(fps).toLocaleString() + " FPS";
     }
 
-    function showPage(id) {
-        document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-    }
-
-    // GMD Logic
     let currentObjects = [];
-    let originalXML = null;
+    let originalDoc = null;
+
     async function loadGMD(input) {
         const file = input.files[0];
         if (!file) return;
         const text = await file.text();
-        originalXML = new DOMParser().parseFromString(text, "text/xml");
-        const k4 = Array.from(originalXML.getElementsByTagName('k')).find(x => x.textContent === 'k4').nextElementSibling.textContent;
-        const bin = atob(k4.replace(/-/g, '+').replace(/_/g, '/'));
-        const bytes = pako.inflate(new Uint8Array(bin.split('').map(c => c.charCodeAt(0))), { to: 'string' });
-        currentObjects = bytes.split(';').filter(s => s.length > 5).map(s => {
-            const d = {};
-            s.split(',').forEach((v, i, a) => { if(i%2===0) d[v] = a[i+1]; });
-            return d;
-        });
-        document.getElementById('editor-ui').classList.remove('hidden');
-        document.getElementById('dropZone').classList.add('hidden');
-        renderObjects();
+        const parser = new DOMParser();
+        originalDoc = parser.parseFromString(text, "text/xml");
+        
+        const k2 = Array.from(originalDoc.getElementsByTagName('k')).find(x => x.textContent === 'k2');
+        const k3 = Array.from(originalDoc.getElementsByTagName('k')).find(x => x.textContent === 'k3');
+        const k4 = Array.from(originalDoc.getElementsByTagName('k')).find(x => x.textContent === 'k4');
+
+        if(k2) document.getElementById('lvlName').value = k2.nextElementSibling.textContent;
+        if(k3) document.getElementById('lvlDesc').value = k3.nextElementSibling.textContent;
+
+        if (k4) {
+            const bin = atob(k4.nextElementSibling.textContent.replace(/-/g, '+').replace(/_/g, '/'));
+            const bytes = pako.inflate(new Uint8Array(bin.split('').map(c => c.charCodeAt(0))), { to: 'string' });
+            currentObjects = bytes.split(';').filter(s => s.length > 5).map(s => {
+                const d = {};
+                s.split(',').forEach((v, i, a) => { if(i%2===0) d[v] = a[i+1]; });
+                return d;
+            });
+            document.getElementById('editor-ui').classList.remove('hidden');
+            document.getElementById('dropZone').classList.add('hidden');
+            renderObjects();
+        }
     }
+
     function renderObjects() {
-        document.getElementById('objList').innerHTML = currentObjects.slice(0, 100).map((obj, idx) => `
+        document.getElementById('objList').innerHTML = currentObjects.slice(0, 150).map((obj, idx) => `
             <tr>
                 <td><input type="text" value="${obj['1']}" onchange="currentObjects[${idx}]['1']=this.value"></td>
                 <td><input type="text" value="${obj['2']}" onchange="currentObjects[${idx}]['2']=this.value"></td>
                 <td><input type="text" value="${obj['3']}" onchange="currentObjects[${idx}]['3']=this.value"></td>
                 <td><input type="text" value="${obj['128'] || 1}" onchange="currentObjects[${idx}]['128']=this.value"></td>
                 <td><input type="text" value="${obj['6'] || 0}" onchange="currentObjects[${idx}]['6']=this.value"></td>
-                <td><button onclick="currentObjects.splice(${idx},1);renderObjects()" style="color:red;border:none;background:none;">✕</button></td>
+                <td><button onclick="currentObjects.splice(${idx},1);renderObjects()" style="color:red;border:none;background:none;cursor:pointer;">✕</button></td>
             </tr>
         `).join('');
     }
+
     function saveGMD() {
         const objStr = currentObjects.map(o => Object.entries(o).map(e => e.join(',')).join(',')).join(';') + ';';
         const compressed = pako.deflate(objStr);
         const b64 = btoa(String.fromCharCode.apply(null, compressed)).replace(/\+/g, '-').replace(/\//g, '_');
-        Array.from(originalXML.getElementsByTagName('k')).find(x => x.textContent === 'k4').nextElementSibling.textContent = b64;
-        const blob = new Blob([new XMLSerializer().serializeToString(originalXML)], {type: "text/xml"});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "level.gmd"; a.click();
+
+        const k2 = Array.from(originalDoc.getElementsByTagName('k')).find(x => x.textContent === 'k2');
+        const k3 = Array.from(originalDoc.getElementsByTagName('k')).find(x => x.textContent === 'k3');
+        const k4 = Array.from(originalDoc.getElementsByTagName('k')).find(x => x.textContent === 'k4');
+
+        if(k2) k2.nextElementSibling.textContent = document.getElementById('lvlName').value;
+        if(k3) k3.nextElementSibling.textContent = document.getElementById('lvlDesc').value;
+        if(k4) k4.nextElementSibling.textContent = b64;
+
+        // Генерируем чистую строку XML без лишних мета-тегов браузера
+        const xmlString = '<?xml version="1.0"?><plist version="1.0" gjver="2.0">' + originalDoc.documentElement.innerHTML + '</plist>';
+        
+        const blob = new Blob([xmlString], {type: "application/octet-stream"});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = (document.getElementById('lvlName').value || "level") + ".gmd";
+        a.click();
     }
 </script>
 </body>
