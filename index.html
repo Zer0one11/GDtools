@@ -43,14 +43,22 @@
 <div id="bazinger-page" class="container hidden">
     <h1 style="color: var(--bazinger);">Bazinger Calc</h1>
     <div style="max-width: 400px; margin: 0 auto;">
-        <label>Введите юниты (Reference 1x)</label>
+        <label>Введенные юниты</label>
         <input type="number" id="bazingerInput" step="0.0000000001" value="30.156097">
-        <button onclick="calculateBazingerTPS()" style="width: 100%; background: var(--bazinger); color: #000;">Рассчитать по TPS</button>
+        <label>Для какой скорости?</label>
+        <select id="bazingerSpeedSelect">
+            <option value="0.5">0.5x</option>
+            <option value="1.0" selected>1.0x</option>
+            <option value="2.0">2.0x</option>
+            <option value="3.0">3.0x</option>
+            <option value="4.0">4.0x</option>
+        </select>
+        <button onclick="calculateBazingerTPS()" style="width: 100%; background: var(--bazinger); color: #000;">Рассчитать</button>
     </div>
     <div class="table-wrap">
         <table>
             <thead>
-                <tr><th>Speed</th><th>Target Units</th><th>TPS Equivalent</th></tr>
+                <tr><th>Speed</th><th>Target Units</th><th>TPS</th></tr>
             </thead>
             <tbody id="bazingerTable"></tbody>
         </table>
@@ -105,13 +113,8 @@
 </div>
 
 <script>
-    const constants = {
-        normal: { "0.5": 251.159363, "1": 311.579742, "2": 387.421265, "3": 468.001038, "4": 575.999756 },
-        mini: { "0.5": 502.321411, "1": 623.161926, "2": 774.843140, "3": 936.003967, "4": 1152.005615 }
-    };
-
-    // База на основе твоих 1к ТПС данных
-    const referenceData = {
+    const b_speeds_keys = ["0.5", "1.0", "2.0", "3.0", "4.0"];
+    const referenceGaps = {
         "0.5": 0.990097,
         "1.0": 0.156097,
         "2.0": 0.364403,
@@ -126,34 +129,37 @@
 
     function calculateBazingerTPS() {
         const inputVal = parseFloat(document.getElementById('bazingerInput').value);
+        const selectedSpeed = document.getElementById('bazingerSpeedSelect').value;
         if (!inputVal || inputVal <= 30) return alert("Введите значение > 30");
 
-        const currentGap = inputVal - 30;
-        const baseGap1x = referenceData["1.0"];
-        
-        // Находим множитель сложности относительно твоего примера (1к ТПС при 30.156)
-        const difficultyMultiplier = baseGap1x / currentGap;
-        const currentTPS = 1000 * difficultyMultiplier;
+        const userGap = inputVal - 30;
+        const difficultyMultiplier = referenceGaps[selectedSpeed] / userGap;
+        const targetTPS = 1000 * difficultyMultiplier;
 
         const tbody = document.getElementById('bazingerTable');
         tbody.innerHTML = "";
 
-        Object.keys(referenceData).forEach(speed => {
-            // Рассчитываем целевой зазор для этой скорости, сохраняя сложность
-            const targetGap = referenceData[speed] / difficultyMultiplier;
-            const finalUnits = 30 + targetGap;
+        b_speeds_keys.forEach(speed => {
+            const calculatedGap = referenceGaps[speed] / difficultyMultiplier;
+            const finalUnits = 30 + calculatedGap;
 
             tbody.innerHTML += `
                 <tr>
                     <td>${speed}x</td>
-                    <td style="color:var(--bazinger); font-weight:bold;">${finalUnits.toFixed(8)}</td>
-                    <td>${Math.round(currentTPS).toLocaleString()} TPS</td>
+                    <td style="color:${speed === selectedSpeed ? 'var(--accent)' : 'var(--bazinger)'}; font-weight:bold;">
+                        ${finalUnits.toFixed(8)}
+                    </td>
+                    <td>${Math.round(targetTPS).toLocaleString()}</td>
                 </tr>
             `;
         });
     }
 
-    // Вспомогательные функции Gap Finder / Editor / Calc (как раньше)
+    const constants = {
+        normal: { "0.5": 251.159363, "1": 311.579742, "2": 387.421265, "3": 468.001038, "4": 575.999756 },
+        mini: { "0.5": 502.321411, "1": 623.161926, "2": 774.843140, "3": 936.003967, "4": 1152.005615 }
+    };
+
     function findGaps() {
         let fps = parseFloat(document.getElementById('targetFps').value);
         if (!fps) return;
