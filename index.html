@@ -43,14 +43,14 @@
 <div id="bazinger-page" class="container hidden">
     <h1 style="color: var(--bazinger);">Bazinger Calc</h1>
     <div style="max-width: 400px; margin: 0 auto;">
-        <label>Введите значение (например 30.005)</label>
-        <input type="number" id="bazingerInput" step="0.0000000001" value="30.005">
-        <button onclick="calculateBazingerCorrect()" style="width: 100%; background: var(--bazinger); color: #000;">Рассчитать FPS</button>
+        <label>Введите юниты (Reference 1x)</label>
+        <input type="number" id="bazingerInput" step="0.0000000001" value="30.156097">
+        <button onclick="calculateBazingerTPS()" style="width: 100%; background: var(--bazinger); color: #000;">Рассчитать по TPS</button>
     </div>
     <div class="table-wrap">
         <table>
             <thead>
-                <tr><th>Speed</th><th>Difference</th><th>Blocks/Sec</th><th>Result FPS (+1)</th></tr>
+                <tr><th>Speed</th><th>Target Units</th><th>TPS Equivalent</th></tr>
             </thead>
             <tbody id="bazingerTable"></tbody>
         </table>
@@ -109,29 +109,51 @@
         normal: { "0.5": 251.159363, "1": 311.579742, "2": 387.421265, "3": 468.001038, "4": 575.999756 },
         mini: { "0.5": 502.321411, "1": 623.161926, "2": 774.843140, "3": 936.003967, "4": 1152.005615 }
     };
-    const b_speeds = { "0.5": 8.37193493, "1.0": 10.38592002, "2.0": 12.91390686, "3.0": 15.59989392, "4.0": 19.19986483 };
+
+    // База на основе твоих 1к ТПС данных
+    const referenceData = {
+        "0.5": 0.990097,
+        "1.0": 0.156097,
+        "2.0": 0.364403,
+        "3.0": 0.585800,
+        "4.0": 0.882600
+    };
 
     function showPage(id) {
         document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
     }
 
-    function calculateBazingerCorrect() {
-        const fullVal = parseFloat(document.getElementById('bazingerInput').value);
-        if (!fullVal || fullVal <= 30) return alert("Введите значение > 30");
-        const units = fullVal - 30;
-        const baseFps_1x = 8230 / units;
-        const baseSpeed_1x = b_speeds["1.0"];
+    function calculateBazingerTPS() {
+        const inputVal = parseFloat(document.getElementById('bazingerInput').value);
+        if (!inputVal || inputVal <= 30) return alert("Введите значение > 30");
+
+        const currentGap = inputVal - 30;
+        const baseGap1x = referenceData["1.0"];
+        
+        // Находим множитель сложности относительно твоего примера (1к ТПС при 30.156)
+        const difficultyMultiplier = baseGap1x / currentGap;
+        const currentTPS = 1000 * difficultyMultiplier;
+
         const tbody = document.getElementById('bazingerTable');
         tbody.innerHTML = "";
-        Object.keys(b_speeds).forEach(mode => {
-            const currentSpeed = b_speeds[mode];
-            const diff = currentSpeed - baseSpeed_1x;
-            const finalFps = Math.ceil(baseFps_1x * (currentSpeed / baseSpeed_1x)) + 1;
-            tbody.innerHTML += `<tr><td>${mode}x</td><td>${diff > 0 ? '+' : ''}${diff.toFixed(4)}</td><td>${currentSpeed.toFixed(4)}</td><td><b style="color:var(--bazinger)">${finalFps.toLocaleString()} FPS</b></td></tr>`;
+
+        Object.keys(referenceData).forEach(speed => {
+            // Рассчитываем целевой зазор для этой скорости, сохраняя сложность
+            const targetGap = referenceData[speed] / difficultyMultiplier;
+            const finalUnits = 30 + targetGap;
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>${speed}x</td>
+                    <td style="color:var(--bazinger); font-weight:bold;">${finalUnits.toFixed(8)}</td>
+                    <td>${Math.round(currentTPS).toLocaleString()} TPS</td>
+                </tr>
+            `;
         });
     }
 
+    // Вспомогательные функции Gap Finder / Editor / Calc (как раньше)
     function findGaps() {
         let fps = parseFloat(document.getElementById('targetFps').value);
         if (!fps) return;
