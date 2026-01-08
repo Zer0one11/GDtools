@@ -22,6 +22,8 @@
         td { padding: 12px; border-bottom: 1px solid var(--border); }
         .hidden { display: none !important; }
         .help-box { margin-top: 25px; padding: 15px; border-left: 4px solid var(--accent); background: #111; font-size: 0.85rem; line-height: 1.4; color: #ccc; }
+        .thanks { margin-top: 40px; text-align: center; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .thanks b { color: var(--accent); }
     </style>
 </head>
 <body>
@@ -37,68 +39,183 @@
         <button onclick="window.open('https://conv.nattie.dev/', '_blank')">Macro Converter</button>
         <button class="full-width" onclick="showPage('wolfram-page')">WolframAlpha Solver</button>
     </div>
+    <div class="thanks">Special thanks to: <b>Skub</b></div>
 </div>
 
 <div id="bazinger-page" class="container hidden">
-    <h1 style="color: var(--bazinger);">Bazinger Calc</h1>
+    <h1 style="color: var(--bazinger);">Bazinger Calc (Cube)</h1>
     <div style="max-width: 400px; margin: 0 auto;">
-        <label>Введите размер щели (Gap Size)</label>
-        <input type="number" id="bazingerGap" step="0.0000000001" placeholder="Например: 30.00005">
-        <button onclick="calculateBazingerDeep()" style="width: 100%; background: var(--bazinger); color: #000;">Рассчитать сложность</button>
+        <label>Базовый FPS (1x Speed / 1 Unit)</label>
+        <input type="number" id="baseBazingerFps" value="8230">
+        <button onclick="calculateBazinger()" style="width: 100%; background: var(--bazinger); color: #000;">Рассчитать FPS</button>
     </div>
     <div class="table-wrap">
         <table>
-            <thead><tr><th>Speed</th><th>Blocks/Sec</th><th>Result FPS (+1)</th></tr></thead>
+            <thead><tr><th>Speed</th><th>Blocks/Sec</th><th>Required FPS (+1)</th></tr></thead>
             <tbody id="bazingerTable"></tbody>
         </table>
     </div>
     <div class="help-box">
-        <b>Bazinger Deep Logic:</b><br>
-        1. Сначала вычисляется базовый FPS для 1x скорости по формуле $FPS = 311.579742 / (Gap - 3)$.<br>
-        2. Затем этот FPS умножается на коэффициент разницы скоростей ($Blocks/Sec$).
+        <b>Логика Skub:</b> Расчет разницы FPS на основе скорости перемещения куба ($Blocks/Sec$). Результат округляется до целого $+1$.
     </div>
     <button style="width:100%; margin-top:30px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
 </div>
 
+<div id="finder-page" class="container hidden">
+    <h1>Gap Finder</h1>
+    <div style="max-width: 400px; margin: 0 auto;">
+        <label>Целевой FPS</label>
+        <input type="number" id="targetFps" placeholder="Например: 360">
+        <div style="margin-bottom: 15px;"><input type="checkbox" id="finderDash" style="width: auto; margin-right: 10px;"><label style="display: inline;">Dash Orb активен?</label></div>
+        <button onclick="findGaps()" style="width: 100%; background: var(--accent); color: #000;">Рассчитать зазоры</button>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+        <div><h3 style="text-align:center; color: var(--accent);">Big Wave</h3><div class="table-wrap"><table><thead><tr><th>Speed</th><th>Gap Size</th></tr></thead><tbody id="bigWaveTable"></tbody></table></div></div>
+        <div><h3 style="text-align:center; color: var(--accent);">Mini Wave</h3><div class="table-wrap"><table><thead><tr><th>Speed</th><th>Gap Size</th></tr></thead><tbody id="miniWaveTable"></tbody></table></div></div>
+    </div>
+    <button style="width:100%; margin-top:30px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
+</div>
+
+<div id="editor-page" class="container hidden">
+    <h1>GMD Editor</h1>
+    <div id="dropZone" style="border: 2px dashed #333; padding: 40px; text-align: center; cursor: pointer;" onclick="document.getElementById('fileIn').click()">
+        Загрузить .gmd файл
+        <input type="file" id="fileIn" class="hidden" accept=".gmd" onchange="loadGMD(this)">
+    </div>
+    <div id="editor-ui" class="hidden">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
+            <div><label>Название</label><input type="text" id="lvlName"></div>
+            <div><label>Описание</label><input type="text" id="lvlDesc"></div>
+        </div>
+        <button onclick="saveGMD()" style="width: 100%; background: var(--accent); color: #000; margin-bottom: 10px;">СОХРАНИТЬ .GMD</button>
+        <div class="table-wrap"><table><thead><tr><th>ID</th><th>X</th><th>Y</th><th>Scale</th><th>Rot</th><th></th></tr></thead><tbody id="objList"></tbody></table></div>
+    </div>
+    <button style="width:100%; margin-top:15px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
+</div>
+
+<div id="gap-page" class="container hidden">
+    <h1>Gap Calculator</h1>
+    <div style="max-width: 500px; margin: 0 auto;">
+        <label>Размер гапа</label><input type="number" id="gapSize" step="0.0000000001" placeholder="3.12345">
+        <label>Режим волны</label><select id="gapMode"><option value="normal">Обычная волна</option><option value="mini">Мини волна</option></select>
+        <label>Скорость</label><select id="gapSpeed"><option value="0.5">0.5x Speed</option><option value="1" selected>1x Speed</option><option value="2">2x Speed</option><option value="3">3x Speed</option><option value="4">4x Speed</option></select>
+        <div style="margin-bottom: 15px;"><input type="checkbox" id="gapDash" style="width: auto; margin-right: 10px;"><label style="display: inline;">Dash Orb активен?</label></div>
+        <button onclick="calculatePreciseGap()" style="width: 100%; background: var(--accent); color: #000;">Рассчитать FPS</button>
+        <div id="gapRes" style="text-align: center; font-size: 2rem; margin-top: 20px; color: var(--accent); font-weight: bold;"></div>
+    </div>
+    <button style="width:100%; margin-top:30px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
+</div>
+
+<div id="wolfram-page" class="container hidden">
+    <h1>WolframAlpha Solver</h1>
+    <input type="text" id="wolfInput" placeholder="Введите запрос...">
+    <button onclick="window.open('https://www.wolframalpha.com/input/?i='+encodeURIComponent(document.getElementById('wolfInput').value))" style="width:100%; background:var(--accent); color:#000">РЕШИТЬ</button>
+    <button style="width:100%; margin-top:30px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
+</div>
+
 <script>
-    const b_speeds = { "0.5": 8.37193493, "1.0": 10.38592002, "2.0": 12.91390686, "3.0": 15.59989392, "4.0": 19.19986483 };
-    const k_1x = 311.579742;
+    const constants = {
+        normal: { "0.5": 251.159363, "1": 311.579742, "2": 387.421265, "3": 468.001038, "4": 575.999756 },
+        mini: { "0.5": 502.321411, "1": 623.161926, "2": 774.843140, "3": 936.003967, "4": 1152.005615 }
+    };
+
+    // Данные из скриншота
+    const b_speeds = { 
+        "0.5": 8.37193493, 
+        "1.0": 10.38592002, 
+        "2.0": 12.91390686, 
+        "3.0": 15.59989392, 
+        "4.0": 19.19986483 
+    };
 
     function showPage(id) {
         document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
     }
 
-    function calculateBazingerDeep() {
-        const gap = parseFloat(document.getElementById('bazingerGap').value);
-        if (!gap || gap <= 3) return alert("Введите корректный размер щели (> 3)");
-
+    // Логика Bazinger для куба
+    function calculateBazinger() {
+        const baseFps = parseFloat(document.getElementById('baseBazingerFps').value);
+        if (!baseFps) return alert("Введите базовый FPS");
         const tbody = document.getElementById('bazingerTable');
         tbody.innerHTML = "";
+        
+        const baseSpeed = b_speeds["1.0"]; // 10.385...
 
-        // Находим FPS для 1x скорости
-        const baseFps_1x = k_1x / (gap - 3);
-        const baseSpeed = b_speeds["1.0"];
-
-        Object.keys(b_speeds).forEach(s => {
-            const currentSpeed = b_speeds[s];
+        Object.keys(b_speeds).forEach(mode => {
+            const currentSpeed = b_speeds[mode];
+            // Делим текущую скорость на базовую 1x
             const ratio = currentSpeed / baseSpeed;
+            // Умножаем FPS на разницу, округляем и +1
+            const res = Math.ceil(baseFps * ratio) + 1;
             
-            // Расчет: FPS на 1x * разница скоростей + 1
-            const finalFps = Math.ceil(baseFps_1x * ratio) + 1;
-            
-            tbody.innerHTML += `
-                <tr>
-                    <td>${s}x</td>
-                    <td>${currentSpeed}</td>
-                    <td><b style="color:var(--bazinger)">${finalFps.toLocaleString()} FPS</b></td>
-                </tr>
-            `;
+            tbody.innerHTML += `<tr><td>${mode}x</td><td>${currentSpeed}</td><td><b style="color:var(--bazinger)">${res.toLocaleString()} FPS</b></td></tr>`;
         });
     }
 
-    // Здесь функции findGaps, calculatePreciseGap, loadGMD, saveGMD из прошлого кода...
-    // (Оставил их в логике, чтобы сайт был полным)
+    function findGaps() {
+        let fps = parseFloat(document.getElementById('targetFps').value);
+        if (!fps) return;
+        if (document.getElementById('finderDash').checked) fps *= 2;
+        const fill = (id, m) => {
+            const b = document.getElementById(id); b.innerHTML = "";
+            Object.keys(constants[m]).forEach(s => {
+                const g = (constants[m][s] / fps) + 3;
+                b.innerHTML += `<tr><td>${s}x</td><td>${g.toFixed(10)}</td></tr>`;
+            });
+        };
+        fill("bigWaveTable", "normal"); fill("miniWaveTable", "mini");
+    }
+
+    function calculatePreciseGap() {
+        const gap = parseFloat(document.getElementById('gapSize').value);
+        const k = constants[document.getElementById('gapMode').value][document.getElementById('gapSpeed').value];
+        let fps = k / (gap - 3);
+        if (document.getElementById('gapDash').checked) fps *= 2;
+        document.getElementById('gapRes').innerText = Math.round(fps).toLocaleString() + " FPS";
+    }
+
+    // GMD Editor Functions
+    let currentObjects = []; let originalDoc = null;
+    async function loadGMD(input) {
+        const file = input.files[0]; if (!file) return;
+        const text = await file.text();
+        originalDoc = new DOMParser().parseFromString(text, "text/xml");
+        const k4 = Array.from(originalDoc.getElementsByTagName('k')).find(x => x.textContent === 'k4');
+        const k2 = Array.from(originalDoc.getElementsByTagName('k')).find(x => x.textContent === 'k2');
+        if(k2) document.getElementById('lvlName').value = k2.nextElementSibling.textContent;
+        const bin = atob(k4.nextElementSibling.textContent.replace(/-/g, '+').replace(/_/g, '/'));
+        const bytes = pako.inflate(new Uint8Array(bin.split('').map(c => c.charCodeAt(0))), { to: 'string' });
+        currentObjects = bytes.split(';').filter(s => s.length > 5).map(s => {
+            const d = {}; s.split(',').forEach((v, i, a) => { if(i%2===0) d[v] = a[i+1]; }); return d;
+        });
+        document.getElementById('editor-ui').classList.remove('hidden');
+        document.getElementById('dropZone').classList.add('hidden');
+        renderObjects();
+    }
+
+    function renderObjects() {
+        document.getElementById('objList').innerHTML = currentObjects.slice(0, 100).map((obj, idx) => `
+            <tr>
+                <td><input type="text" value="${obj['1']}" onchange="currentObjects[${idx}]['1']=this.value"></td>
+                <td><input type="text" value="${obj['2']}" onchange="currentObjects[${idx}]['2']=this.value"></td>
+                <td><input type="text" value="${obj['3']}" onchange="currentObjects[${idx}]['3']=this.value"></td>
+                <td><input type="text" value="${obj['128'] || 1}" onchange="currentObjects[${idx}]['128']=this.value"></td>
+                <td><input type="text" value="${obj['6'] || 0}" onchange="currentObjects[${idx}]['6']=this.value"></td>
+                <td><button onclick="currentObjects.splice(${idx},1);renderObjects()" style="color:red;border:none;background:none;">✕</button></td>
+            </tr>
+        `).join('');
+    }
+
+    function saveGMD() {
+        const objStr = currentObjects.map(o => Object.entries(o).map(e => e.join(',')).join(',')).join(';') + ';';
+        const b64 = btoa(String.fromCharCode.apply(null, pako.deflate(objStr))).replace(/\+/g, '-').replace(/\//g, '_');
+        const k4 = Array.from(originalDoc.getElementsByTagName('k')).find(x => x.textContent === 'k4');
+        if(k4) k4.nextElementSibling.textContent = b64;
+        const xml = '<?xml version="1.0"?><plist version="1.0" gjver="2.0">' + originalDoc.documentElement.innerHTML + '</plist>';
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([xml], {type: "application/octet-stream"}));
+        a.download = (document.getElementById('lvlName').value || "level") + ".gmd"; a.click();
+    }
 </script>
 </body>
 </html>
