@@ -21,8 +21,8 @@
         th { position: sticky; top: 0; background: #0a0a0a; color: var(--accent); padding: 12px; border-bottom: 1px solid var(--accent); }
         td { padding: 12px; border-bottom: 1px solid var(--border); }
         .hidden { display: none !important; }
-        .thanks { margin-top: 40px; text-align: center; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
-        .thanks b { color: var(--accent); }
+        .thanks-box { margin-top: 25px; text-align: center; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid var(--border); padding-top: 15px; }
+        .thanks-box b { color: var(--bazinger); }
     </style>
 </head>
 <body>
@@ -38,15 +38,14 @@
         <button onclick="window.open('https://conv.nattie.dev/', '_blank')">Macro Converter</button>
         <button class="full-width" onclick="showPage('wolfram-page')">WolframAlpha Solver</button>
     </div>
-    <div class="thanks">Special thanks to: <b>Skub</b></div>
 </div>
 
 <div id="bazinger-page" class="container hidden">
-    <h1 style="color: var(--bazinger);">Bazinger Calc (Cube)</h1>
+    <h1 style="color: var(--bazinger);">Bazinger Calc</h1>
     <div style="max-width: 400px; margin: 0 auto;">
-        <label>Введите юниты (Units)</label>
-        <input type="number" id="bazingerUnits" step="0.0000000001" value="1">
-        <button onclick="calculateBazingerUnits()" style="width: 100%; background: var(--bazinger); color: #000;">Рассчитать FPS</button>
+        <label>Введите значение (например 30.005)</label>
+        <input type="number" id="bazingerInput" step="0.0000000001" value="30.005">
+        <button onclick="calculateBazingerDeep()" style="width: 100%; background: var(--bazinger); color: #000;">Рассчитать FPS</button>
     </div>
     <div class="table-wrap">
         <table>
@@ -54,14 +53,14 @@
             <tbody id="bazingerTable"></tbody>
         </table>
     </div>
+    <div class="thanks-box">Special thanks to: <b>Skub</b></div>
     <button style="width:100%; margin-top:30px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
 </div>
 
 <div id="finder-page" class="container hidden">
     <h1>Gap Finder</h1>
     <div style="max-width: 400px; margin: 0 auto;">
-        <label>Целевой FPS</label>
-        <input type="number" id="targetFps" placeholder="Например: 360">
+        <label>Целевой FPS</label><input type="number" id="targetFps" placeholder="360">
         <div style="margin-bottom: 15px;"><input type="checkbox" id="finderDash" style="width: auto; margin-right: 10px;"><label style="display: inline;">Dash Orb активен?</label></div>
         <button onclick="findGaps()" style="width: 100%; background: var(--accent); color: #000;">Рассчитать зазоры</button>
     </div>
@@ -76,7 +75,7 @@
     <h1>GMD Editor</h1>
     <div id="dropZone" style="border: 2px dashed #333; padding: 40px; text-align: center; cursor: pointer;" onclick="document.getElementById('fileIn').click()">Загрузить .gmd файл<input type="file" id="fileIn" class="hidden" accept=".gmd" onchange="loadGMD(this)"></div>
     <div id="editor-ui" class="hidden">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;"><div><label>Название</label><input type="text" id="lvlName"></div></div>
+        <label>Название</label><input type="text" id="lvlName">
         <button onclick="saveGMD()" style="width: 100%; background: var(--accent); color: #000; margin-bottom: 10px;">СОХРАНИТЬ .GMD</button>
         <div class="table-wrap"><table><thead><tr><th>ID</th><th>X</th><th>Y</th><th>Scale</th><th>Rot</th><th></th></tr></thead><tbody id="objList"></tbody></table></div>
     </div>
@@ -108,7 +107,6 @@
         normal: { "0.5": 251.159363, "1": 311.579742, "2": 387.421265, "3": 468.001038, "4": 575.999756 },
         mini: { "0.5": 502.321411, "1": 623.161926, "2": 774.843140, "3": 936.003967, "4": 1152.005615 }
     };
-
     const b_speeds = { "0.5": 8.37193493, "1.0": 10.38592002, "2.0": 12.91390686, "3.0": 15.59989392, "4.0": 19.19986483 };
 
     function showPage(id) {
@@ -116,30 +114,27 @@
         document.getElementById(id).classList.remove('hidden');
     }
 
-    // НОВАЯ ЛОГИКА BAZINGER ПО ЮНИТАМ
-    function calculateBazingerUnits() {
-        const units = parseFloat(document.getElementById('bazingerUnits').value);
-        if (!units || units <= 0) return alert("Введите корректное число юнитов");
+    function calculateBazingerDeep() {
+        const fullVal = parseFloat(document.getElementById('bazingerInput').value);
+        if (!fullVal || fullVal <= 30) return alert("Введите значение больше 30 (например 30.005)");
         
+        // Извлекаем дробную часть (юниты)
+        const units = fullVal - 30;
         const tbody = document.getElementById('bazingerTable');
         tbody.innerHTML = "";
         
-        // 1. Базовый FPS для 1x скорости при указанных юнитах (8230 / Units)
+        // Базовый расчет: 8230 FPS / юниты для 1x скорости
         const baseFps_1x = 8230 / units;
-        const baseSpeed_1x = b_speeds["1.0"]; // 10.385...
+        const baseSpeed_1x = b_speeds["1.0"];
 
         Object.keys(b_speeds).forEach(mode => {
-            const currentSpeed = b_speeds[mode];
-            // 2. Расчет разницы скоростей (Blocks/Sec)
-            const ratio = currentSpeed / baseSpeed_1x;
-            // 3. Финальный FPS: База * разница, округление вверх + 1
+            const ratio = b_speeds[mode] / baseSpeed_1x;
             const finalFps = Math.ceil(baseFps_1x * ratio) + 1;
-            
-            tbody.innerHTML += `<tr><td>${mode}x</td><td>${currentSpeed}</td><td><b style="color:var(--bazinger)">${finalFps.toLocaleString()} FPS</b></td></tr>`;
+            tbody.innerHTML += `<tr><td>${mode}x</td><td>${b_speeds[mode]}</td><td><b style="color:var(--bazinger)">${finalFps.toLocaleString()} FPS</b></td></tr>`;
         });
     }
 
-    // ФУНКЦИИ GAP FINDER / CALC / EDITOR
+    // GAP & Editor functions
     function findGaps() {
         let fps = parseFloat(document.getElementById('targetFps').value);
         if (!fps) return;
