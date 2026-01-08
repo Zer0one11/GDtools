@@ -21,7 +21,6 @@
         th { position: sticky; top: 0; background: #0a0a0a; color: var(--accent); padding: 12px; border-bottom: 1px solid var(--accent); }
         td { padding: 12px; border-bottom: 1px solid var(--border); }
         .hidden { display: none !important; }
-        .help-box { margin-top: 25px; padding: 15px; border-left: 4px solid var(--accent); background: #111; font-size: 0.85rem; line-height: 1.4; color: #ccc; }
         .thanks { margin-top: 40px; text-align: center; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
         .thanks b { color: var(--accent); }
     </style>
@@ -45,18 +44,15 @@
 <div id="bazinger-page" class="container hidden">
     <h1 style="color: var(--bazinger);">Bazinger Calc (Cube)</h1>
     <div style="max-width: 400px; margin: 0 auto;">
-        <label>Базовый FPS (1x Speed / 1 Unit)</label>
-        <input type="number" id="baseBazingerFps" value="8230">
-        <button onclick="calculateBazinger()" style="width: 100%; background: var(--bazinger); color: #000;">Рассчитать FPS</button>
+        <label>Введите юниты (Units)</label>
+        <input type="number" id="bazingerUnits" step="0.0000000001" value="1">
+        <button onclick="calculateBazingerUnits()" style="width: 100%; background: var(--bazinger); color: #000;">Рассчитать FPS</button>
     </div>
     <div class="table-wrap">
         <table>
             <thead><tr><th>Speed</th><th>Blocks/Sec</th><th>Required FPS (+1)</th></tr></thead>
             <tbody id="bazingerTable"></tbody>
         </table>
-    </div>
-    <div class="help-box">
-        <b>Логика Skub:</b> Расчет разницы FPS на основе скорости перемещения куба ($Blocks/Sec$). Результат округляется до целого $+1$.
     </div>
     <button style="width:100%; margin-top:30px; background:#18181b" onclick="showPage('main-menu')">Назад</button>
 </div>
@@ -78,15 +74,9 @@
 
 <div id="editor-page" class="container hidden">
     <h1>GMD Editor</h1>
-    <div id="dropZone" style="border: 2px dashed #333; padding: 40px; text-align: center; cursor: pointer;" onclick="document.getElementById('fileIn').click()">
-        Загрузить .gmd файл
-        <input type="file" id="fileIn" class="hidden" accept=".gmd" onchange="loadGMD(this)">
-    </div>
+    <div id="dropZone" style="border: 2px dashed #333; padding: 40px; text-align: center; cursor: pointer;" onclick="document.getElementById('fileIn').click()">Загрузить .gmd файл<input type="file" id="fileIn" class="hidden" accept=".gmd" onchange="loadGMD(this)"></div>
     <div id="editor-ui" class="hidden">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
-            <div><label>Название</label><input type="text" id="lvlName"></div>
-            <div><label>Описание</label><input type="text" id="lvlDesc"></div>
-        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;"><div><label>Название</label><input type="text" id="lvlName"></div></div>
         <button onclick="saveGMD()" style="width: 100%; background: var(--accent); color: #000; margin-bottom: 10px;">СОХРАНИТЬ .GMD</button>
         <div class="table-wrap"><table><thead><tr><th>ID</th><th>X</th><th>Y</th><th>Scale</th><th>Rot</th><th></th></tr></thead><tbody id="objList"></tbody></table></div>
     </div>
@@ -119,40 +109,37 @@
         mini: { "0.5": 502.321411, "1": 623.161926, "2": 774.843140, "3": 936.003967, "4": 1152.005615 }
     };
 
-    // Данные из скриншота
-    const b_speeds = { 
-        "0.5": 8.37193493, 
-        "1.0": 10.38592002, 
-        "2.0": 12.91390686, 
-        "3.0": 15.59989392, 
-        "4.0": 19.19986483 
-    };
+    const b_speeds = { "0.5": 8.37193493, "1.0": 10.38592002, "2.0": 12.91390686, "3.0": 15.59989392, "4.0": 19.19986483 };
 
     function showPage(id) {
         document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
     }
 
-    // Логика Bazinger для куба
-    function calculateBazinger() {
-        const baseFps = parseFloat(document.getElementById('baseBazingerFps').value);
-        if (!baseFps) return alert("Введите базовый FPS");
+    // НОВАЯ ЛОГИКА BAZINGER ПО ЮНИТАМ
+    function calculateBazingerUnits() {
+        const units = parseFloat(document.getElementById('bazingerUnits').value);
+        if (!units || units <= 0) return alert("Введите корректное число юнитов");
+        
         const tbody = document.getElementById('bazingerTable');
         tbody.innerHTML = "";
         
-        const baseSpeed = b_speeds["1.0"]; // 10.385...
+        // 1. Базовый FPS для 1x скорости при указанных юнитах (8230 / Units)
+        const baseFps_1x = 8230 / units;
+        const baseSpeed_1x = b_speeds["1.0"]; // 10.385...
 
         Object.keys(b_speeds).forEach(mode => {
             const currentSpeed = b_speeds[mode];
-            // Делим текущую скорость на базовую 1x
-            const ratio = currentSpeed / baseSpeed;
-            // Умножаем FPS на разницу, округляем и +1
-            const res = Math.ceil(baseFps * ratio) + 1;
+            // 2. Расчет разницы скоростей (Blocks/Sec)
+            const ratio = currentSpeed / baseSpeed_1x;
+            // 3. Финальный FPS: База * разница, округление вверх + 1
+            const finalFps = Math.ceil(baseFps_1x * ratio) + 1;
             
-            tbody.innerHTML += `<tr><td>${mode}x</td><td>${currentSpeed}</td><td><b style="color:var(--bazinger)">${res.toLocaleString()} FPS</b></td></tr>`;
+            tbody.innerHTML += `<tr><td>${mode}x</td><td>${currentSpeed}</td><td><b style="color:var(--bazinger)">${finalFps.toLocaleString()} FPS</b></td></tr>`;
         });
     }
 
+    // ФУНКЦИИ GAP FINDER / CALC / EDITOR
     function findGaps() {
         let fps = parseFloat(document.getElementById('targetFps').value);
         if (!fps) return;
@@ -175,7 +162,6 @@
         document.getElementById('gapRes').innerText = Math.round(fps).toLocaleString() + " FPS";
     }
 
-    // GMD Editor Functions
     let currentObjects = []; let originalDoc = null;
     async function loadGMD(input) {
         const file = input.files[0]; if (!file) return;
